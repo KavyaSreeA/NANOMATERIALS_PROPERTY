@@ -1,0 +1,62 @@
+{
+  "task": "A",
+  "seed": 42,
+  "c2db_cleaning": {
+    "with_stiffness": 8462,
+    "finite_tensor": 8462,
+    "positive_definite": 7474,
+    "asymmetry_ok": 7258,
+    "Y2D_positive": 7258
+  },
+  "jarvis_cleaning": {
+    "with_tensor_string": 229,
+    "corrupt_tensor": 18,
+    "stable_xx_yy_block": 186
+  },
+  "rows_per_target": {
+    "Y2D": {
+      "c2db_rows": 7258,
+      "jarvis_rows": 186
+    },
+    "poisson": {
+      "c2db_rows": 7229,
+      "jarvis_rows": 185
+    }
+  },
+  "leakage_first_target": {
+    "random": {
+      "chemsys_in_train": 0.608431726575953,
+      "formula_in_train": 0.35726173456892085,
+      "family_in_train": 0.9575655053131402
+    },
+    "cluster": {
+      "chemsys_in_train": 0.6089873422528018,
+      "formula_in_train": 0.3551945746545082,
+      "family_in_train": 0.9589426309963869
+    },
+    "chemsys": {
+      "chemsys_in_train": 0.0,
+      "formula_in_train": 0.0,
+      "family_in_train": 0.9578392786963679
+    },
+    "family": {
+      "chemsys_in_train": 0.5901140659144544,
+      "formula_in_train": 0.3359173781547066,
+      "family_in_train": 0.0
+    }
+  },
+  "n_features": 141,
+  "targets": {
+    "Y2D": "log",
+    "poisson": "none"
+  },
+  "convention": "n_layers=1 for all rows; Y2D (total) == Y2D_per_layer",
+  "quick": false,
+  "versions": {
+    "python": "3.11.9",
+    "sklearn": "1.9.1",
+    "numpy": "2.4.6",
+    "pandas": "2.3.3"
+  },
+  "runtime_s": 997.1
+}

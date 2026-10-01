@@ -1,0 +1,47 @@
+{
+  "c2db": {
+    "rows_with_stiffness": 8462,
+    "clean_steps": {
+      "with_stiffness": 8462,
+      "finite_tensor": 8462,
+      "positive_definite": 7474,
+      "asymmetry_ok": 7258,
+      "Y2D_positive": 7258
+    },
+    "unique_chemsys_clean": 3806,
+    "unique_families_clean": 676,
+    "Y2D_clean": {
+      "count": 7258.0,
+      "mean": 66.63,
+      "std": 67.89,
+      "min": 0.09,
+      "25%": 24.08,
+      "50%": 47.93,
+      "75%": 82.87,
+      "max": 713.58
+    },
+    "poisson_rows_abs_le_1": 7229
+  },
+  "jarvis": {
+    "steps": {
+      "with_tensor_string": 229,
+      "corrupt_tensor": 18,
+      "stable_xx_yy_block": 186
+    },
+    "Y2D_clean": {
+      "count": 186.0,
+      "mean": 76.34,
+      "std": 57.18,
+      "min": 2.46,
+      "25%": 33.08,
+      "50%": 71.1,
+      "75%": 103.23,
+      "max": 386.28
+    },
+    "chemsys_shared_with_c2db_clean": 131
+  },
+  "bidb": {
+    "status": "unavailable",
+    "reason": "BiDB properties file not found: C:\\Users\\kavya\\NANOMATERIALS_PROPERTY\\Dataset\\bidb\\bidb_properties.csv"
+  }
+}

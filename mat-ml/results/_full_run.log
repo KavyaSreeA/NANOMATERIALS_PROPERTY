@@ -1,0 +1,52 @@
+﻿C2DB cleaning: {'with_stiffness': 8462, 'finite_tensor': 8462, 'positive_definite': 7474, 'asymmetry_ok': 7258, 'Y2D_positive': 7258}
+JARVIS cleaning: {'with_tensor_string': 229, 'corrupt_tensor': 18, 'stable_xx_yy_block': 186}
+  Y2D               random    ridge             MAE=22.51  R2=0.686
+  Y2D               random    random_forest     MAE=14.67  R2=0.849
+  Y2D               random    gradient_boosting MAE=13.74  R2=0.873
+  Y2D               cluster   ridge             MAE=22.57  R2=0.685
+  Y2D               cluster   random_forest     MAE=14.72  R2=0.842
+  Y2D               cluster   gradient_boosting MAE=13.98  R2=0.865
+  Y2D               chemsys   ridge             MAE=22.76  R2=0.672
+  Y2D               chemsys   random_forest     MAE=14.82  R2=0.834
+  Y2D               chemsys   gradient_boosting MAE=13.91  R2=0.864
+  Y2D               family    ridge             MAE=31.12  R2=-11.023
+  Y2D               family    random_forest     MAE=20.88  R2=0.670
+  Y2D               family    gradient_boosting MAE=19.82  R2=0.703
+  poisson           random    ridge             MAE=0.1442  R2=0.109
+  poisson           random    random_forest     MAE=0.1073  R2=0.412
+  poisson           random    gradient_boosting MAE=0.1109  R2=0.394
+  poisson           cluster   ridge             MAE=0.1438  R2=0.114
+  poisson           cluster   random_forest     MAE=0.1065  R2=0.422
+  poisson           cluster   gradient_boosting MAE=0.1106  R2=0.395
+  poisson           chemsys   ridge             MAE=0.1443  R2=0.110
+  poisson           chemsys   random_forest     MAE=0.1047  R2=0.440
+  poisson           chemsys   gradient_boosting MAE=0.1092  R2=0.417
+  poisson           family    ridge             MAE=0.1521  R2=0.034
+  poisson           family    random_forest     MAE=0.14  R2=0.142
+  poisson           family    gradient_boosting MAE=0.1405  R2=0.139
+# Task A results (seed 42)
+
+Metrics are means over folds, in original units (N/m for Y2D). `x(s/random)` = MAE under scheme s divided by MAE under random CV.
+
+## Random vs cluster-stratified vs grouped
+
+| target | model | MAE random | MAE cluster | MAE chemsys | MAE family | R2 random | R2 cluster | R2 chemsys | R2 family | MAE x(cluster/random) | MAE x(chemsys/random) | MAE x(family/random) |
+|---|---|---|---|---|---|---|---|---|---|---|---|---|
+| Y2D | gradient_boosting | 13.736 | 13.981 | 13.914 | 19.817 | 0.873 | 0.865 | 0.864 | 0.703 | 1.018 | 1.013 | 1.443 |
+| Y2D | random_forest | 14.671 | 14.718 | 14.822 | 20.876 | 0.849 | 0.842 | 0.834 | 0.670 | 1.003 | 1.010 | 1.423 |
+| Y2D | ridge | 22.505 | 22.573 | 22.758 | 31.118 | 0.686 | 0.685 | 0.672 | -11.023 | 1.003 | 1.011 | 1.383 |
+| poisson | gradient_boosting | 0.111 | 0.111 | 0.109 | 0.140 | 0.394 | 0.395 | 0.417 | 0.139 | 0.998 | 0.985 | 1.267 |
+| poisson | random_forest | 0.107 | 0.107 | 0.105 | 0.140 | 0.412 | 0.422 | 0.440 | 0.142 | 0.992 | 0.976 | 1.305 |
+| poisson | ridge | 0.144 | 0.144 | 0.144 | 0.152 | 0.109 | 0.114 | 0.110 | 0.034 | 0.997 | 1.001 | 1.055 |
+
+## Leakage: fraction of test rows whose key also occurs in training (mean over folds)
+
+| scheme | chemsys_in_train | formula_in_train | family_in_train |
+|---|---|---|---|
+| random | 0.608 | 0.357 | 0.958 |
+| cluster | 0.609 | 0.355 | 0.959 |
+| chemsys | 0.000 | 0.000 | 0.958 |
+| family | 0.590 | 0.336 | 0.000 |
+
+
+Wrote results to C:\Users\kavya\NANOMATERIALS_PROPERTY\mat-ml\results

@@ -1,0 +1,49 @@
+# mat-ml configuration. All paths are relative to the mat-ml/ folder.
+seed: 42
+
+paths:
+  data_root: ../Dataset            # raw files stay untouched here (C2DB alone is ~2.3 GB)
+  c2db_dir: c2db/materials         # per-material folders: data.json, structure.json, results-asr.stiffness.json
+  jarvis_json: jarvis_dft_2d.json
+  # Task B inputs. NOT PRESENT in this checkout (see README); the loader fails loudly if absent.
+  bidb_dir: bidb
+  bidb_properties: bidb_properties.csv
+  cache_dir: cache
+  results_dir: results
+
+# ---- conventions (see README "Units and per-layer vs total") ----
+units:
+  stiffness: N/m                   # 2D elastic constants; JARVIS unit is inferred, C2DB unit is documented (GPAW)
+  binding_energy: unconfirmed      # BiDB; probably meV/A^2 per interface. Never converted silently.
+  distance: Angstrom
+
+stability:
+  tol_min_eig: 0.0                 # C2DB: symmetrised 3x3 (xx,yy,xy) tensor must have min eigenvalue > tol
+  max_asym_frac: 0.10              # drop C2DB tensors with max|C-C^T| / max|C| above this (data-quality flag)
+
+cleaning:
+  max_ehull: null                  # eV/atom; null = do not filter on energy above hull
+  poisson_abs_max: 1.0             # Poisson task only: drop |c12/c22| above this (documented in README)
+  bidb_iqr_k: 3.0                  # BiDB outlier rule: drop targets outside [Q1-k*IQR, Q3+k*IQR] in log10 space
+
+features:
+  composition: magpie              # matminer Magpie via pymatgen Composition
+  use_dft_descriptors: false       # if true adds ehull/hform (DFT outputs, not inputs) -- leaves off by default
+
+cv:
+  n_splits: 5
+  n_clusters: 20                   # K-means on standardised Magpie features for the cluster-stratified scheme
+  schemes: [random, cluster, chemsys, family]
+
+targets:
+  taskA:
+    Y2D: log                       # ln-transformed for fitting; metrics reported in N/m and in log space
+    poisson: none                  # can be <= 0, so not log-transformed
+  taskB:
+    binding_energy_gs: log
+    distance: log
+
+models:
+  gbm: lightgbm                    # falls back to sklearn GradientBoostingRegressor if lightgbm is missing
+  rf_trees: 300
+  gbm_trees: 500

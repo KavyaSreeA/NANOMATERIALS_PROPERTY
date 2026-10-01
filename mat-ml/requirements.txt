@@ -1,0 +1,8 @@
+numpy>=1.26
+pandas>=2.2
+scikit-learn>=1.4
+scipy>=1.11
+pyyaml>=6.0
+pymatgen>=2024.1
+matminer>=0.9
+lightgbm>=4.0
