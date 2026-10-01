@@ -1,0 +1,4 @@
+https://c2db.fysik.dtu.dk/
+https://jarvis-tools.readthedocs.io/en/master/databases.html
+https://arxiv.org/pdf/2004.03025
+https://2dhub.org/hetdb/hetdb.html
