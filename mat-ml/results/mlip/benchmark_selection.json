@@ -1,0 +1,32 @@
+{
+  "pool_rows": 3380,
+  "pool_families": 395,
+  "selected_c2db": 150,
+  "selected_families": 150,
+  "jarvis_rows": 186,
+  "seed": 42,
+  "Y2D_quantiles_pool": [
+    7.3,
+    21.9,
+    44.9,
+    79.8,
+    179.3
+  ],
+  "Y2D_quantiles_selected": [
+    5.7,
+    14.2,
+    30.5,
+    58.4,
+    139.9
+  ],
+  "nat_median_pool_vs_selected": [
+    7.0,
+    8.0
+  ],
+  "n_elements_pool": 62,
+  "n_elements_selected": 55,
+  "family_size_median_pool_vs_selected_pool_size": [
+    2.0,
+    3.0
+  ]
+}

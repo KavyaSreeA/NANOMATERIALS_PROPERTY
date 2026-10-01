@@ -16,7 +16,7 @@ import pandas as pd
 from sklearn.base import clone
 
 from . import data as D
-from .features import build_features
+from .features import build_features, prototype_features
 from .models import get_models
 from .splits import make_splits
 from .train import fwd, inv, md_table, score
@@ -26,12 +26,19 @@ GEOM = [c for c in STRUCT if c not in ("spg_number", "n_layers")]  # n_layers is
 
 
 def feature_sets(X: pd.DataFrame) -> dict:
-    comp = [c for c in X.columns if c.startswith("mp_")] + ["n_elements"]
-    return {"all": list(X.columns), "composition": comp, "structure": STRUCT,
+    proto = [c for c in X.columns if c == "lgnum" or c.startswith(("lg_", "anon_"))]
+    lg = [c for c in proto if c == "lgnum" or c.startswith("lg_")]
+    anon = [c for c in proto if c.startswith("anon_")]
+    base = [c for c in X.columns if c not in proto]
+    comp = [c for c in base if c.startswith("mp_")] + ["n_elements"]
+    return {"all": base, "composition": comp, "structure": STRUCT,
+            # prototype features (layer group, anonymous formula)
+            "all_plus_layergroup": base + lg, "all_plus_anon": base + anon, "all_plus_prototype": base + proto,
+            "composition_plus_prototype": comp + proto, "prototype_only": proto,
             # spg_number ablation
             "geometry_no_spg": GEOM,                                   # a, b, gamma, area/atom, nat, thickness
             "spg_only": ["spg_number"],
-            "all_no_spg": [c for c in X.columns if c != "spg_number"],
+            "all_no_spg": [c for c in base if c != "spg_number"],
             "composition_plus_spg": comp + ["spg_number"]}
 
 
@@ -50,6 +57,8 @@ def main():
     ap.add_argument("--sets", nargs="+", default=["all", "composition", "structure"])
     ap.add_argument("--prefix", default="robustness", help="output file prefix")
     ap.add_argument("--no-baselines", action="store_true")
+    ap.add_argument("--prototype", action="store_true", help="append layer-group and anonymous-formula columns")
+    ap.add_argument("--proto-min-count", type=int, default=10)
     ap.add_argument("--config")
     args = ap.parse_args()
     cfg = D.load_config(args.config)
@@ -57,7 +66,10 @@ def main():
     target, kind = "Y2D", cfg["targets"]["taskA"]["Y2D"]
     df, _ = D.clean_c2db(D.load_c2db(cfg), cfg)
     X, comp_cols = build_features(df, cfg)
+    if args.prototype:
+        X = pd.concat([X, prototype_features(df, args.proto_min_count)], axis=1)
     sets = feature_sets(X)
+    print({k: len(v) for k, v in sets.items()}, flush=True)
     y = df[target].to_numpy(float)
     yt = fwd(y, kind)
     n_splits = cfg["cv"]["n_splits"]
@@ -105,11 +117,11 @@ def main():
     # paired family/random MAE ratio per seed
     pv = per_seed.pivot_table(index=["seed", "model", "features"], columns="scheme", values="mae").reset_index()
     for s in ("family", "chemsys"):
-        if s in pv:
+        if s in pv and "random" in pv:
             pv[f"{s}/random"] = pv[s] / pv["random"]
     spec = {f"{s}_over_random_{stat}": (f"{s}/random", stat)
             for s in ("family", "chemsys") if f"{s}/random" in pv for stat in ("mean", "std", "min")}
-    ratio = pv.groupby(["model", "features"]).agg(**spec).reset_index()
+    ratio = pv.groupby(["model", "features"]).agg(**spec).reset_index() if spec else pv[["model", "features"]].drop_duplicates()
     ratio.to_csv(rd / f"{args.prefix}_ratios.csv", index=False)
     text = [f"# Robustness: Y2D, seeds {args.seeds}, {n_splits}-fold", "",
             "MAE in N/m; r2_log is R2 of ln(Y2D) (stable under extrapolation). sd = std across seeds of the fold-mean.", "",

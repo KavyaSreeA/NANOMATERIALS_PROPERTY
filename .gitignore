@@ -1,0 +1,3 @@
+.venv-mlip/
+mat-ml/results/_*.log
+mat-ml/results/mlip/_run_*

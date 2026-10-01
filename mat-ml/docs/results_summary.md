@@ -83,7 +83,35 @@ Findings:
 - `spg_number` alone is nearly uninformative (MAE 38.0 vs 42.4 for the global mean under random CV, and worse than the global mean under family CV).
 - The structure-only score comes from geometry, not symmetry: removing `spg_number` costs 1.1 N/m under random CV and none under family CV.
 - The full model barely depends on it (0.3 N/m). The family/random gap stays 1.44 either way, so the gap is not an artefact of this feature.
-- Limit: this tests the coarse space-group number only. The finer prototype indicator (layer group + anonymous formula) was not offered as a feature.
+- Limit: this tests the coarse space-group number only. The finer prototype descriptors (layer group, anonymous formula) are tested in section 4b.
+
+## 4b. Layer group and anonymous formula as features (LightGBM, seeds 42-46)
+
+New columns (`prototype_features`): layer-group number, one-hot layer group (53 columns), one-hot anonymous formula (59 columns); categories with
+fewer than 10 rows are collapsed to "other". Category lists use row counts only (no labels). Not available for JARVIS, so not part of the external check.
+Note the `family` split holds out the (anonymous formula, layer group) **pair**; each marginal still appears elsewhere in training.
+
+| Features | random MAE | family MAE | R2(ln) random | R2(ln) family | family/random |
+|---|---|---|---|---|---|
+| prototype columns only | 28.3 | 40.8 | 0.46 | 0.06 | 1.44 |
+| composition only (reference) | 19.2 | 25.5 | 0.65 | 0.50 | 1.33 |
+| composition + prototype | 16.3 | 23.9 | 0.73 | 0.57 | 1.47 |
+| composition + `spg_number` (reference) | 16.9 | 24.4 | 0.72 | 0.55 | 1.44 |
+| all (reference) | 13.80 | 19.90 | 0.80 | 0.68 | 1.44 |
+| all + layer group | 13.63 | 19.75 | 0.81 | 0.69 | 1.45 |
+| all + anonymous formula | 13.76 | 20.03 | 0.80 | 0.67 | 1.46 |
+| all + both | 13.63 | 19.69 | 0.81 | 0.69 | 1.45 |
+
+Seed std is 0.03-0.26 N/m.
+
+- Under random CV the prototype columns alone reach R2(ln) 0.455, the same as the family-mean baseline (0.463): the model recovers the family identity from the two
+  one-hots. Under family CV they reach 0.06, essentially nothing: layer group and anonymous formula individually carry almost no stiffness information, and the
+  signal sits in the specific combination, which an unseen family does not provide.
+- Adding them to the full feature set changes MAE by -0.2 to +0.1 N/m (at most 1.3%), which is within about 1-3 seed standard deviations. Composition, geometry and the other columns already encode most of this
+  information (atom count, thickness, composition).
+- They help composition-only features (-3.0 N/m random, -1.6 family), about as much as `spg_number` or the geometry columns do.
+- The family/random gap stays at 1.44-1.47x. It is not closable by adding prototype descriptors, so it reflects genuine extrapolation to new prototypes.
+- Limits: single model (LightGBM); one-hot trees can rebuild family identity, which is why random CV looks good; improvements of 0.2 N/m are not distinguishable from noise.
 
 ## 5. JARVIS cross-database check (train on all C2DB, predict JARVIS)
 
@@ -110,7 +138,7 @@ Supported by these runs:
 - Random splits overestimate stiffness-prediction accuracy on C2DB when structure family is held out: MAE is 1.4x higher and R2 falls from 0.87 to 0.70.
 - Holding out chemical systems does not produce a gap (1.00x), so family-level grouping is the meaningful stress test on this dataset.
 - Cross-database performance on unseen chemistry is clearly worse than on matched materials, with wide uncertainty.
-- Geometry features, not symmetry class, carry the structure signal.
+- Geometry features, not symmetry class, carry the structure signal; layer group and anonymous formula add at most about 1% to the full model.
 
 Not supported / not tested:
 - Anything about bilayers or multilayers: no bilayer stiffness exists in any available file, and BiDB is missing. Task B code is untested on real data.
@@ -133,16 +161,17 @@ Not supported / not tested:
 | `results/task_A_*` | seed-42 baselines: fold metrics, summary, comparison table, run info |
 | `results/robustness_*` | five-seed runs, feature ablation, null baselines, paired ratios |
 | `results/spg_ablation_*` | `spg_number` ablation |
+| `results/proto_features_*` | layer-group / anonymous-formula features |
 | `results/external_*` | JARVIS multi-seed check and label-agreement table |
 | `results/data_audit.json` | cleaning counts |
 | `results/_quick_task_A_comparison.md` | smoke test with reduced trees (not a result) |
 | `docs/literature_notes.md` | extraction from the seven PDFs |
 
 Commands: `python -m src.train --task A`, `python -m src.robustness --seeds 42 43 44 45 46`,
-`python -m src.robustness ... --sets geometry_no_spg spg_only all_no_spg composition_plus_spg --prefix spg_ablation`, `python -m src.external --seeds 42 43 44 45 46`.
+`python -m src.robustness ... --sets geometry_no_spg spg_only all_no_spg composition_plus_spg --prefix spg_ablation`,
+`python -m src.robustness ... --prototype --sets all_plus_layergroup all_plus_anon all_plus_prototype composition_plus_prototype prototype_only --prefix proto_features`, `python -m src.external --seeds 42 43 44 45 46`.
 
 ## 9. Suggested next steps
 
 1. Locate BiDB (and the uid map) to run Task B.
-2. Offer layer group / anonymous formula as features, to measure how much of the family signal a model can recover.
-3. Add bilayer stiffness labels (e.g. from a universal ML potential validated against C2DB/JARVIS) before any bilayer or multi-task claim.
+2. Add bilayer stiffness labels (e.g. from a universal ML potential validated against C2DB/JARVIS) before any bilayer or multi-task claim.

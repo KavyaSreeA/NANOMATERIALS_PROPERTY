@@ -1,0 +1,10 @@
+model,variant,subset,n,spearman,mae,mae_threshold,pass_spearman,pass_mae,GATE_PASS
+chgnet_0.3.0,relaxed_cell,all,334,0.7872898287712524,33.83372904788599,12.930753509453815,False,False,False
+chgnet_0.3.0,relaxed_cell,c2db,150,0.8301755633583714,23.37300745383854,12.930753509453815,False,False,False
+chgnet_0.3.0,relaxed_cell,jarvis,184,0.710027528468248,42.361491216946405,12.930753509453815,False,False,False
+mace_mp0_medium,relaxed_cell,all,334,0.8196577806647994,28.133359336226516,12.930753509453815,False,False,False
+mace_mp0_medium,relaxed_cell,c2db,150,0.8266198497711009,19.27887465075203,12.930753509453815,False,False,False
+mace_mp0_medium,relaxed_cell,jarvis,184,0.7631877034710847,35.35168924286333,12.930753509453815,False,False,False
+mace_mpa0_medium,relaxed_cell,all,334,0.8737203651574409,47.14291089181292,12.930753509453815,False,False,False
+mace_mpa0_medium,relaxed_cell,c2db,150,0.9393430819147519,9.914407108906955,12.930753509453815,True,True,True
+mace_mpa0_medium,relaxed_cell,jarvis,184,0.8132049448246985,77.49223462787756,12.930753509453815,False,False,False
