@@ -39,4 +39,4 @@ Final models and model cards are in [`mat-ml/models/`](mat-ml/models/); every nu
 Place the files under `Dataset/` (paths in `mat-ml/config.yaml`; see `mat-ml/data/README.md`). `Dataset/` is deliberately not tracked (the C2DB tree is about 2.3 GB).
 
 ## Status and limits
-One training database and one external set; no hyper-parameter tuning; tabular models only; no separate held-out test set (generalisation is measured by grouped cross-validation and the external set). No licence has been chosen yet.
+One training database and one external set; no hyper-parameter tuning; tabular models only; no separate held-out test set (generalisation is measured by grouped cross-validation and the external set). Released under the MIT License (see [`LICENSE.MD`](LICENSE.MD)).
