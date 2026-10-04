@@ -33,7 +33,7 @@ results/              fold metrics, summaries, task_*_comparison.md
 docs/literature_notes.md
 ```
 
-Results are summarised in `docs/results_summary.md` (Task A), `docs/taskb_results.md` (Task B) and `docs/mlip_calibration.md` (ML-potential validation); the literature extraction is in `docs/literature_notes.md`.
+Results are summarised in `docs/results_summary.md` (Task A), `docs/taskb_results.md` (Task B) and `docs/mlip_calibration.md` (ML-potential validation). `docs/methods_and_models.md` is a one-page manifest of everything trained, the features, splits, seeds and metric formulas; `docs/literature_comparison.md` compares with the papers in `research papers/`; `results/headline_metrics.md` has MAE, RMSE, R2, ln R2 for every configuration; `results/diagnostics/` has out-of-fold parity and residual plots; `models/` has the saved final models with model cards (in-sample numbers there are optimistic; use the cross-validated ones); tests run with `python -m pytest tests -q`.
 
 ## Conventions
 

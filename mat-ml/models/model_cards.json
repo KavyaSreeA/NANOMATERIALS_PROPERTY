@@ -1,0 +1,146 @@
+{
+  "hyperparameters": {
+    "model": "LightGBM (via sklearn pipeline: median imputer + LGBMRegressor)",
+    "n_estimators": 500,
+    "learning_rate": 0.05,
+    "num_leaves": 31,
+    "subsample": 0.8,
+    "subsample_freq": 1,
+    "colsample_bytree": 0.5,
+    "random_state": 42
+  },
+  "versions": {
+    "python": "3.11.9",
+    "scikit-learn": "1.9.1",
+    "lightgbm": "4.7.0",
+    "numpy": "2.4.6",
+    "pandas": "2.3.3"
+  },
+  "how_to_read": "Use the cross-validated numbers for expected accuracy on NEW data: random splits are optimistic; for new structure families (Task A) or new monolayers/families (Task B) use the 'family' / 'monolayer' entries. In-sample numbers only show that the file loads and fits.",
+  "domain": "Task A: mechanically stable, non-filtered C2DB-like monolayers. Task B: BiDB homobilayers of C2DB monolayers; magnetic layers were not excluded.",
+  "models": {
+    "taskA_Y2D": {
+      "file": "models/taskA_Y2D.joblib",
+      "size_kb": 548,
+      "n_train": 7258,
+      "n_features": 141,
+      "target_transform": "log",
+      "in_sample_MAE_optimistic": 7.956198402921678,
+      "in_sample_R2_optimistic": 0.9598797736573335,
+      "round_trip_ok": true,
+      "task": "A: monolayer stiffness",
+      "unit": "N/m",
+      "training_data": "C2DB, mechanically stable monolayers (tensor positive definite, asymmetry <= 10%)",
+      "feature_set": "Magpie (132) + n_elements + a, b, gamma, area_per_atom, nat, z_extent, n_layers, spg_number",
+      "cross_validated_MAE_N_per_m_5seeds": {
+        "random": {
+          "mean": 13.797691467602949,
+          "seed_sd": 0.1075025509143845,
+          "ln_R2": 0.8022096411139916
+        },
+        "chemsys": {
+          "mean": 13.85877752211916,
+          "seed_sd": 0.0651548862974255,
+          "ln_R2": 0.8063898742558477
+        },
+        "family": {
+          "mean": 19.90096289055296,
+          "seed_sd": 0.2152184798434208,
+          "ln_R2": 0.6786138262638739
+        }
+      }
+    },
+    "taskA_poisson": {
+      "file": "models/taskA_poisson.joblib",
+      "size_kb": 552,
+      "n_train": 7229,
+      "n_features": 141,
+      "target_transform": "none",
+      "in_sample_MAE_optimistic": 0.06063920274225022,
+      "in_sample_R2_optimistic": 0.8305732542487461,
+      "round_trip_ok": true,
+      "task": "A: monolayer stiffness",
+      "unit": "",
+      "training_data": "C2DB, mechanically stable monolayers (tensor positive definite, asymmetry <= 10%)",
+      "feature_set": "Magpie (132) + n_elements + a, b, gamma, area_per_atom, nat, z_extent, n_layers, spg_number",
+      "cross_validated_seed42": {
+        "random": {
+          "MAE": 0.1108582157124569,
+          "R2": 0.3941211426171114
+        },
+        "chemsys": {
+          "MAE": 0.1092239227680849,
+          "R2": 0.4166265520951168
+        },
+        "family": {
+          "MAE": 0.140490876740034,
+          "R2": 0.1394175687500581
+        }
+      }
+    },
+    "taskB_binding_energy_zscan": {
+      "file": "models/taskB_binding_energy_zscan.joblib",
+      "size_kb": 557,
+      "n_train": 9993,
+      "n_features": 147,
+      "target_transform": "log",
+      "in_sample_MAE_optimistic": 2.07637224544434,
+      "in_sample_R2_optimistic": 0.9936525138878358,
+      "round_trip_ok": true,
+      "task": "B: BiDB interlayer label from monolayer information",
+      "unit": "meV/A^2",
+      "valid_range": "> 0 and <= 277.2",
+      "training_data": "BiDB homobilayers (PBE-D3, rigid C2DB layers); all stackings of each monolayer",
+      "feature_set": "mono_stiffness: Magpie + monolayer geometry + layer group + C2DB stiffness via uid map (147). Identical for all stackings of a monolayer.",
+      "cross_validated_MAE_5seeds": {
+        "random": {
+          "mean": 2.421685455701743,
+          "seed_sd": 0.0104765495982122,
+          "ln_R2": 0.9398473084717718
+        },
+        "monolayer": {
+          "mean": 9.069016459049363,
+          "seed_sd": 0.4240952386382418,
+          "ln_R2": 0.6426711869147048
+        },
+        "family": {
+          "mean": 13.588858743144025,
+          "seed_sd": 0.3011712010013388,
+          "ln_R2": 0.3505378218867063
+        }
+      }
+    },
+    "taskB_distance": {
+      "file": "models/taskB_distance.joblib",
+      "size_kb": 558,
+      "n_train": 10189,
+      "n_features": 147,
+      "target_transform": "log",
+      "in_sample_MAE_optimistic": 0.22233018427895493,
+      "in_sample_R2_optimistic": 0.7386666938702138,
+      "round_trip_ok": true,
+      "task": "B: BiDB interlayer label from monolayer information",
+      "unit": "A",
+      "valid_range": "> 0 and <= 6.599",
+      "training_data": "BiDB homobilayers (PBE-D3, rigid C2DB layers); all stackings of each monolayer",
+      "feature_set": "mono_stiffness: Magpie + monolayer geometry + layer group + C2DB stiffness via uid map (147). Identical for all stackings of a monolayer.",
+      "cross_validated_MAE_5seeds": {
+        "random": {
+          "mean": 0.2483281801910222,
+          "seed_sd": 0.0005333638197635,
+          "ln_R2": 0.6875266151480289
+        },
+        "monolayer": {
+          "mean": 0.2778521312129987,
+          "seed_sd": 0.0048544410146061,
+          "ln_R2": 0.398425858263305
+        },
+        "family": {
+          "mean": 0.3159552121925268,
+          "seed_sd": 0.0023061941964174,
+          "ln_R2": 0.309783334244082
+        }
+      }
+    }
+  }
+}
