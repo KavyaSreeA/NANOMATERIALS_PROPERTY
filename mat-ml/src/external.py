@@ -61,11 +61,12 @@ def metrics(y, p):
 
 def boot_ci(y, p, n=2000, seed=0):
     rng = np.random.default_rng(seed)
-    stats = {"mae": [], "r2_log": []}
+    stats = {"mae": [], "r2_log": [], "spearman": []}
     for _ in range(n):
         i = rng.integers(0, len(y), len(y))
         stats["mae"].append(mean_absolute_error(y[i], p[i]))
         stats["r2_log"].append(r2_score(np.log(y[i]), np.log(np.clip(p[i], 1e-6, None))))
+        stats["spearman"].append(spearmanr(y[i], p[i])[0])
     return {f"{k}_lo": np.percentile(v, 2.5) for k, v in stats.items()} | {f"{k}_hi": np.percentile(v, 97.5) for k, v in stats.items()}
 
 
@@ -73,6 +74,7 @@ def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--seeds", nargs="+", type=int, default=[42, 43, 44, 45, 46])
     ap.add_argument("--sets", nargs="+", default=["all", "composition", "structure"])
+    ap.add_argument("--prefix", default="external", help="output file prefix; use a new prefix to keep earlier results untouched")
     ap.add_argument("--config")
     args = ap.parse_args()
     cfg = D.load_config(args.config)
@@ -117,7 +119,7 @@ def main():
 
     d = pd.DataFrame(rows)
     rd = D.ROOT / cfg["paths"]["results_dir"]
-    d.to_csv(rd / "external_per_seed.csv", index=False)
+    d.to_csv(rd / f"{args.prefix}_per_seed.csv", index=False)
     agg = d.groupby(["model", "features", "subset"]).agg(
         n=("n", "first"), mae=("mae", "mean"), mae_sd=("mae", "std"), r2=("r2", "mean"), r2_log=("r2_log", "mean"),
         r2_log_sd=("r2_log", "std"), spearman=("spearman", "mean")).reset_index()
@@ -127,17 +129,22 @@ def main():
             if mask.sum() > 5:
                 ci.append({"model": mname, "features": fset, "subset": sub, **boot_ci(yj[mask], p[mask])})
     agg = agg.merge(pd.DataFrame(ci), on=["model", "features", "subset"], how="left")
-    agg.to_csv(rd / "external_summary.csv", index=False)
+    agg.to_csv(rd / f"{args.prefix}_summary.csv", index=False)
 
+    pr = pd.DataFrame({"jid": jar.jid.values, "chemsys": jar.chemsys.values, "reduced_formula": jar.reduced_formula.values, "y_ref": yj,
+                       "unseen_chemsys": unseen, "matched": matched})
+    for (mname, fset), p in preds.items():
+        pr[f"pred_{mname}_{fset}"] = p
+    pr.to_csv(rd / f"{args.prefix}_predictions.csv", index=False)
     from .train import md_table
-    show = agg[["model", "features", "subset", "n", "mae", "mae_sd", "mae_lo", "mae_hi", "r2_log", "r2_log_lo", "r2_log_hi", "spearman"]]
+    show = agg[["model", "features", "subset", "n", "mae", "mae_sd", "mae_lo", "mae_hi", "r2_log", "r2_log_lo", "r2_log_hi", "spearman", "spearman_lo", "spearman_hi"]]
     text = [f"# JARVIS external check, seeds {args.seeds}", "",
             "Fit on all clean C2DB rows (ln Y2D), predict JARVIS Y2D (N/m). mae_sd = std across model seeds; "
             "[lo, hi] = 95% bootstrap interval over JARVIS rows on the seed-averaged prediction.", "",
             "## Models vs JARVIS", "", md_table(show), "",
             "## Label agreement: C2DB label vs JARVIS label on matched materials (not model skill)", "",
             md_table(pd.DataFrame([ceil])) if ceil else "no matches", "", f"runtime {time.time() - t0:.0f}s"]
-    (rd / "external_report.md").write_text("\n".join(text), encoding="utf-8")
+    (rd / f"{args.prefix}_report.md").write_text("\n".join(text), encoding="utf-8")
     print("\n".join(text))
 
 
