@@ -117,12 +117,14 @@ def stress_voigt(atoms: Atoms) -> np.ndarray:
     return np.asarray(atoms.get_stress(), float)  # Voigt (xx,yy,zz,yz,xz,xy), eV/A^3
 
 
-def elastic_constants(atoms0: Atoms, calc, s: Settings) -> dict:
+def elastic_constants(atoms0: Atoms, calc, s: Settings, return_atoms: bool = False):
     """Return the 2D elastic constants (N/m) and diagnostics. atoms0 must already be oriented."""
     t0 = time.time()
     a = atoms0.copy()
     a.calc = calc
     info = {"variant": s.variant, "n_atoms": len(a)}
+    cp_in = a.cell.cellpar()[[0, 1, 5]].copy()   # a, b, gamma of the input cell
+    info["a_b_gamma_in"] = cp_in.tolist()
     ref_stress = None
     if s.variant == "relaxed_cell":
         info["ref_relax"] = relax(a, s, cell=True)
@@ -130,10 +132,14 @@ def elastic_constants(atoms0: Atoms, calc, s: Settings) -> dict:
         info["ref_relax"] = relax(a, s, cell=False)
     else:
         raise ValueError(s.variant)
-    info["a_b_gamma"] = a.cell.cellpar()[[0, 1, 5]].tolist()
+    cp_out = a.cell.cellpar()[[0, 1, 5]]
+    info["a_b_gamma"] = cp_out.tolist()
+    info["cell_drift_rel"] = float(np.max(np.abs(cp_out - cp_in) / cp_in))   # ~0 for variant "dft_cell" (cell never touched)
     info["Lz"] = lz(a)
     ref_stress = stress_voigt(a)
     info["ref_stress_xx_yy_xy_eV_A3"] = ref_stress[[0, 1, 5]].tolist()
+    # residual 2D stress at the reference geometry (N/m): non-zero when the potential's equilibrium cell differs from the input
+    info["pre_stress_xx_yy_xy_N_m"] = (ref_stress[[0, 1, 5]] * info["Lz"] * EV_A2_TO_N_M).tolist()
 
     sig = {}
     conv_all, steps = True, 0
@@ -162,7 +168,7 @@ def elastic_constants(atoms0: Atoms, calc, s: Settings) -> dict:
                  "stable_tensor": bool(w[0] > 0), "strain_relax_converged": bool(conv_all), "strain_relax_steps": steps,
                  "Y2D": (c11 * c22 - c12**2) / c22 if c22 != 0 else np.nan, "poisson": c12 / c22 if c22 != 0 else np.nan,
                  "seconds": time.time() - t0})
-    return info
+    return (info, a) if return_atoms else info
 
 
 def energy_stress_check(atoms0: Atoms, calc, d: float = 1e-3, pre_strain: float = 0.02) -> dict:  # d=1e-4 is too small for float32 models (CHGNet): FD noise up to +-7%; 1e-3 gives 1.000 +- 0.004

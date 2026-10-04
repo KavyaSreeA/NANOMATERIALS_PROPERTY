@@ -1,0 +1,24 @@
+{
+  "jarvis_rows": 1103,
+  "numeric_exfoliation_energy": 748,
+  "nat<=10": 597,
+  "non_magnetic(|magmom|<0.05)": 485,
+  "magmom_missing_among_nat<=10": 0,
+  "pool": 485,
+  "selected": 40,
+  "seed": 42,
+  "Eb_ref_quantiles_selected": [
+    14.3,
+    18.4,
+    21.8,
+    26.0,
+    137.6
+  ],
+  "Eb_ref_quantiles_pool": [
+    0.0,
+    18.9,
+    23.0,
+    30.3,
+    427.4
+  ]
+}

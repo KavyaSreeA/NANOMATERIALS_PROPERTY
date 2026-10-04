@@ -1,0 +1,75 @@
+{
+  "n_benchmark": 150,
+  "n_relaxed_computed": 150,
+  "n_fixed_computed": 150,
+  "n_paired": 150,
+  "fixed_cell_max_rel_diff_vs_original_C2DB_cell": 4.440892098500626e-16,
+  "fixed_cell_flag_failures": 0,
+  "relaxed_cell_lattice_error_pct": {
+    "median": 0.965157618980339,
+    "mean": 1.5313752562022431,
+    "p90": 3.6180779602093502,
+    "max": 7.319039069049688
+  },
+  "rule_output_preregistered": "B (f_geom <= 0.10)",
+  "statement": "No detectable geometry contribution: fixing the cell to the C2DB geometry changes the Y2D MAE by f_geom = 0.050 (95% CI [-0.093, 0.176], includes zero; the upper bound is below the 0.33 level that would indicate a geometry-dominated error). The analysis does not by itself identify the cause of the remaining error; it is consistent with the potential's strain response.",
+  "f_geom_Y2D": {
+    "point": 0.04952997575648866,
+    "ci95": [
+      -0.09256011183239575,
+      0.17598704376869065
+    ]
+  },
+  "dY_fixed_minus_relaxed": {
+    "median": -0.11215064925826068,
+    "mean": -0.606652808654501,
+    "frac_positive": 0.47333333333333333
+  },
+  "corr_dY_vs_lattice_error": {
+    "pearson": 0.0941378951183136,
+    "spearman": 0.2816391839637317
+  },
+  "pre_stress_over_C11_pct": {
+    "median": 0.8939012320942581,
+    "p90": 2.86252458487812,
+    "frac_gt_2pct": 0.2
+  },
+  "f_geom_Y2D_lattice_error_above_median": {
+    "n": 75,
+    "mae_relaxed": 8.164961198081562,
+    "mae_fixed": 7.749651972517864,
+    "f": 0.05086481313117313,
+    "ci95": [
+      -0.2955958740666912,
+      0.28766720321129924
+    ]
+  },
+  "f_geom_Y2D_lattice_error_below_median": {
+    "n": 75,
+    "mae_relaxed": 11.663853019732347,
+    "mae_fixed": 11.097041557807811,
+    "f": 0.048595559371815734,
+    "ci95": [
+      -0.04376798206014103,
+      0.153529110032209
+    ]
+  },
+  "failures": {
+    "relaxed_cell": {
+      "missing": 0,
+      "exceptions": 0,
+      "ref_relax_not_converged": 1,
+      "strain_relax_not_converged": 0,
+      "ml_unstable_tensor": 9,
+      "asym_gt_10pct": 8
+    },
+    "dft_cell": {
+      "missing": 0,
+      "exceptions": 0,
+      "ref_relax_not_converged": 1,
+      "strain_relax_not_converged": 0,
+      "ml_unstable_tensor": 9,
+      "asym_gt_10pct": 9
+    }
+  }
+}

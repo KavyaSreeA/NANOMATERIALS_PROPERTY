@@ -29,11 +29,14 @@ def main():
     ap.add_argument("--limit", type=int)
     ap.add_argument("--retry-errors", action="store_true", help="recompute ids whose previous record is an error (old error lines are kept in the file; the report uses the last record per id)")
     ap.add_argument("--ids", nargs="+")
+    ap.add_argument("--source", choices=["c2db", "jarvis"], help="restrict to one source (Stage 1 uses c2db: the 150-structure benchmark)")
     ap.add_argument("--fmax", type=float, default=0.005)
     ap.add_argument("--strain", type=float, default=0.01)
     args = ap.parse_args()
 
     items = json.load(open(f"{OUT}/benchmark_inputs.json"))
+    if args.source:
+        items = [i for i in items if i["source"] == args.source]
     if args.ids:
         items = [i for i in items if i["id"] in set(args.ids)]
     if args.limit:
@@ -67,6 +70,8 @@ def main():
             t0 = time.time()
             try:
                 rec["result"] = elastic_constants(load_item(it), calc, s)
+                if args.variant == "dft_cell":   # the C2DB cell must be untouched: record, never silently accept
+                    rec["cell_fixed_ok"] = bool(rec["result"]["cell_drift_rel"] < 1e-8)
             except Exception as e:  # keep going; failures are part of the reliability picture
                 rec["error"] = f"{type(e).__name__}: {e}"
                 rec["trace"] = traceback.format_exc()[-600:]
