@@ -1,0 +1,147 @@
+{
+  "n_bilayers": 10192,
+  "n_monolayers": 992,
+  "n_families": 109,
+  "stacking_uid_parsed": 10192,
+  "bilayers_with_clean_c2db_stiffness": 9680,
+  "monolayers_with_clean_c2db_stiffness": 977,
+  "n_features": {
+    "mono_basic": 140,
+    "mono_stiffness": 147,
+    "mono_stiffness_stacking": 158
+  },
+  "design": "results/taskB_design.md",
+  "per_target": {
+    "binding_energy_zscan": {
+      "n_valid": 9993,
+      "n_removed": 199,
+      "upper_bound": 277.1902965584242,
+      "ceiling_between_monolayer_share_ln": 0.9554720252239282,
+      "n_monolayers": 961,
+      "n_families": 108
+    },
+    "distance": {
+      "n_valid": 10189,
+      "n_removed": 3,
+      "upper_bound": 6.598986739424447,
+      "ceiling_between_monolayer_share_ln": 0.7712024452714767,
+      "n_monolayers": 992,
+      "n_families": 109
+    },
+    "binding_energy_gs": {
+      "n_valid": 9740,
+      "n_removed": 452,
+      "upper_bound": 128.44163864703276,
+      "ceiling_between_monolayer_share_ln": 0.8563685263225937,
+      "n_monolayers": 971,
+      "n_families": 106
+    },
+    "binding_energy_zscan|none": {
+      "n_valid": 10166,
+      "n_removed": 26,
+      "upper_bound": Infinity,
+      "ceiling_between_monolayer_share_ln": 0.9672292139279774,
+      "n_monolayers": 989,
+      "n_families": 109
+    },
+    "distance|none": {
+      "n_valid": 10189,
+      "n_removed": 3,
+      "upper_bound": Infinity,
+      "ceiling_between_monolayer_share_ln": 0.7712024452714767,
+      "n_monolayers": 992,
+      "n_families": 109
+    },
+    "binding_energy_zscan|two_sided": {
+      "n_valid": 9993,
+      "n_removed": 199,
+      "upper_bound": 277.1902965584242,
+      "ceiling_between_monolayer_share_ln": 0.9554720252239282,
+      "n_monolayers": 961,
+      "n_families": 108
+    },
+    "distance|two_sided": {
+      "n_valid": 10080,
+      "n_removed": 112,
+      "upper_bound": 6.598986739424447,
+      "ceiling_between_monolayer_share_ln": 0.7250008849108034,
+      "n_monolayers": 969,
+      "n_families": 103
+    }
+  },
+  "leakage": {
+    "binding_energy_zscan": {
+      "random": {
+        "monolayer_in_train": 0.993295296296797,
+        "family_in_train": 0.99959979989995,
+        "formula_in_train": 0.9949964972476227,
+        "chemsys_in_train": 0.9965975980983484
+      },
+      "monolayer": {
+        "monolayer_in_train": 0.0,
+        "family_in_train": 0.8882242295321836,
+        "formula_in_train": 0.20894758785799308,
+        "chemsys_in_train": 0.371167099065048
+      },
+      "family": {
+        "monolayer_in_train": 0.0,
+        "family_in_train": 0.0,
+        "formula_in_train": 0.10683266234921263,
+        "chemsys_in_train": 0.29584687616976213
+      }
+    },
+    "distance": {
+      "random": {
+        "monolayer_in_train": 0.9920503077752454,
+        "family_in_train": 0.9998037291462218,
+        "formula_in_train": 0.9939149772390365,
+        "chemsys_in_train": 0.9953870568188223
+      },
+      "monolayer": {
+        "monolayer_in_train": 0.0,
+        "family_in_train": 0.8828212899436961,
+        "formula_in_train": 0.19216747289954295,
+        "chemsys_in_train": 0.34959437838650326
+      },
+      "family": {
+        "monolayer_in_train": 0.0,
+        "family_in_train": 0.0,
+        "formula_in_train": 0.17264109900862695,
+        "chemsys_in_train": 0.3316521358653478
+      }
+    },
+    "binding_energy_gs": {
+      "random": {
+        "monolayer_in_train": 0.9904517453798768,
+        "family_in_train": 0.999794661190965,
+        "formula_in_train": 0.9930184804928132,
+        "chemsys_in_train": 0.994558521560575
+      },
+      "monolayer": {
+        "monolayer_in_train": 0.0,
+        "family_in_train": 0.8884219988254074,
+        "formula_in_train": 0.21683658433614966,
+        "chemsys_in_train": 0.3569813649381587
+      },
+      "family": {
+        "monolayer_in_train": 0.0,
+        "family_in_train": 0.0,
+        "formula_in_train": 0.11656340893269976,
+        "chemsys_in_train": 0.29842898917862926
+      }
+    }
+  },
+  "versions": {
+    "pandas": "2.3.3",
+    "numpy": "2.4.6"
+  },
+  "runtime_s": 3562.1,
+  "seeds": [
+    42,
+    43,
+    44,
+    45,
+    46
+  ],
+  "quick": false
+}

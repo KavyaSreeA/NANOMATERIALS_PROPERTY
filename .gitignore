@@ -1,5 +1,8 @@
 .venv-mlip/
 mat-ml/results/_*.log
 mat-ml/results/mlip/_run_*
+mat-ml/results/_*.err
+
+Dataset/
 paper/build/node_modules/
 paper/build/package*.json

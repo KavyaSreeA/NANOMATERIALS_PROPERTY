@@ -1,0 +1,29 @@
+{
+  "settings": {
+    "model": "mace_mpa0_medium",
+    "dispersion": false,
+    "fmax_mono": 0.005,
+    "fmax_bi": 0.01,
+    "max_steps": 500,
+    "n_relax": 3
+  },
+  "check": {
+    "xx": {
+      "analytic": 0.0007431376426073989,
+      "finite_diff": 0.000742806097580151,
+      "ratio": 1.0004463412838531
+    },
+    "yy": {
+      "analytic": -0.001016813297430293,
+      "finite_diff": -0.0010171830976693275,
+      "ratio": 0.9996364467322727
+    }
+  },
+  "versions": {
+    "torch": "2.14.1+cu130",
+    "cuda": "13.0",
+    "ase": "3.29.0",
+    "mace": "0.3.16",
+    "chgnet": "0.4.2"
+  }
+}

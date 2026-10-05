@@ -154,29 +154,10 @@ def run_task_a(cfg, args):
 
 
 def run_task_b(cfg, args):
-    t0 = time.time()
-    try:
-        b = D.load_bidb(cfg)
-    except (FileNotFoundError, KeyError) as e:
-        print(f"Task B cannot run: {e}", file=sys.stderr)
-        sys.exit(2)
-    targets = args.targets or list(cfg["targets"]["taskB"])
-    schemes = [s for s in (args.schemes or ["random", "cluster", "chemsys", "monolayer"])]
-    models = get_models(cfg, cfg["seed"], args.models or MODEL_NAMES, args.quick)
-    all_rows, leak_flat, counts = [], {}, {}
-    for target in targets:
-        kind = cfg["targets"]["taskB"][target]
-        df, log = D.clean_bidb(b, target, cfg)
-        counts[target] = log
-        print(f"BiDB cleaning for {target}: {log}")
-        X, comp_cols = build_features(df, cfg)
-        rows, leak = cross_validate(df, X, comp_cols, target, kind, schemes, models, cfg, args)
-        all_rows += rows
-        leak_flat = leak_flat or leak
-    info = {"task": "B", "seed": cfg["seed"], "cleaning": counts, "n_layers": 2,
-            "convention": "binding energy = per interface (one interface per bilayer), NOT divided by layers; unit unconfirmed",
-            "runtime_s": round(time.time() - t0, 1), "status": "UNTESTED on real data"}
-    write_outputs("B", pd.DataFrame(all_rows), leak_flat, info, cfg)
+    """Task B (BiDB) lives in src/taskb.py; see results/taskB_design.md."""
+    from . import taskb
+    argv = (["--quick"] if args.quick else []) + (["--config", args.config] if args.config else [])
+    taskb.main(argv)
 
 
 def main():

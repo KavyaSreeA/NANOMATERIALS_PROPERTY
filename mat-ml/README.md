@@ -12,7 +12,7 @@ cd mat-ml
 python -m src.data --audit            # data audit -> results/data_audit.json
 python -m src.train --task A          # full Task A (C2DB CV + JARVIS external check)
 python -m src.train --task A --quick  # smoke test with fewer trees
-python -m src.train --task B          # needs BiDB files (see below)
+python -m src.train --task B          # BiDB Task B (~1 h)
 python -m src.robustness --seeds 42 43 44 45 46   # multi-seed + feature ablation + null baselines (~55 min)
 ```
 
@@ -33,7 +33,7 @@ results/              fold metrics, summaries, task_*_comparison.md
 docs/literature_notes.md
 ```
 
-Results are summarised in `docs/results_summary.md`; the literature extraction is in `docs/literature_notes.md`.
+Results are summarised in `docs/results_summary.md` (Task A), `docs/taskb_results.md` (Task B) and `docs/mlip_calibration.md` (ML-potential validation). `docs/methods_and_models.md` is a one-page manifest of everything trained, the features, splits, seeds and metric formulas; `docs/literature_comparison.md` compares with the papers in `research papers/`; `results/headline_metrics.md` has MAE, RMSE, R2, ln R2 for every configuration; `results/diagnostics/` has out-of-fold parity and residual plots; `models/` has the saved final models with model cards (in-sample numbers there are optimistic; use the cross-validated ones); tests run with `python -m pytest tests -q`.
 
 ## Conventions
 
@@ -73,15 +73,16 @@ DFT outputs (ehull, hform, stability labels, gap) are excluded unless `features.
 
 ## Task B status
 
-**BiDB files are not in this checkout** (`bidb_properties.csv`, `bidb_structures.json`, `bidb.db`). `python -m src.train --task B`
-exits with a clear error. The Task B code path (`load_bidb`, `clean_bidb`, `monolayer` grouping, log-IQR outlier rule with k=3) is
-**untested on real data** and written from the column names in the project brief. The uid mapping between BiDB and C2DB is not
-used anywhere; groups for Task B come from `chemsys` (parsed from `stoichiometry`) and `monolayer_uid`.
+BiDB (`bidb.db`, `bidb_properties.csv`, `bidb_structures.json`) and the uid map are in `Dataset/` (since 2026-10-04). Task B is implemented in `src/taskb.py`
+(`python -m src.taskb`, also `python -m src.train --task B`): BiDB DFT binding energy (z-scan) and interlayer gap predicted from monolayer composition, geometry and
+C2DB stiffness (via the uid map), with random / grouped-by-monolayer / grouped-by-family CV, per-fold spread, five seeds and a mean-predictor baseline.
+Design: `results/taskB_design.md`; results: `docs/taskb_results.md`, `results/taskB_*`. The older stub `load_bidb` / `clean_bidb` in `src/data.py` is superseded and unused.
+ML-potential work (`src/mlip/`, separate `.venv-mlip` environment) is closed; see `docs/mlip_calibration.md`.
 
 ## Tested vs untested
 
 - Run and verified here: data loading/cleaning for C2DB and JARVIS, Magpie features, all four Task A split schemes, all three models,
   JARVIS external check, results writing.
-- Not run: anything on BiDB; `use_dft_descriptors: true`; leave-one-group-out variants.
+- Task B (BiDB) was run in full; see `docs/taskb_results.md`. Not run: `use_dft_descriptors: true`; leave-one-group-out variants; graph neural networks.
 - Known limits: JARVIS has only ~186 usable tensors; the 18 corrupt ones are dropped, not repaired; polymorphs are kept as distinct rows
   (no deduplication) and are the reason `family` grouping matters.

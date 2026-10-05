@@ -5,9 +5,11 @@ paths:
   data_root: ../Dataset            # raw files stay untouched here (C2DB alone is ~2.3 GB)
   c2db_dir: c2db/materials         # per-material folders: data.json, structure.json, results-asr.stiffness.json
   jarvis_json: jarvis_dft_2d.json
-  # Task B inputs. NOT PRESENT in this checkout (see README); the loader fails loudly if absent.
-  bidb_dir: bidb
+  # Task B inputs (present in Dataset/ since 2026-10-04)
+  bidb_dir: .
   bidb_properties: bidb_properties.csv
+  bidb_structures: bidb_structures.json
+  bidb_uid_map: bidb_to_c2db_uid_map.csv
   cache_dir: cache
   results_dir: results
 

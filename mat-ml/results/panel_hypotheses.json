@@ -1,0 +1,43 @@
+{
+  "n_targets": 12,
+  "H1_share_ratio_family_gt_1.05": 1.0,
+  "H1_all_R_family_lt_1": true,
+  "H2_spearman_D_family_vs_R_family": {
+    "rho": 0.0,
+    "ci95": [
+      -0.6015113165572088,
+      0.8143022369089985
+    ]
+  },
+  "H3_LOTO_error_ratio_linear_vs_intercept": 1.0122127323350212,
+  "H4_spearman_D_chem_vs_R_chemsys": {
+    "rho": -0.5314685314685316,
+    "ci95": [
+      -0.9211469534050178,
+      0.15645810417340655
+    ]
+  },
+  "H4_LOTO_error_ratio": 0.881882581139716,
+  "H5_spearman_ICC_family_vs_R_family": {
+    "rho": 0.2447552447552448,
+    "ci95": [
+      -0.4786509384775808,
+      0.8725907384230286
+    ]
+  },
+  "H5_covariates_vs_R_family": {
+    "n": 0.39154961589775344,
+    "n_families": 0.2998352914532346,
+    "kurtosis": -0.44055944055944063
+  },
+  "secondary_spearman_D_family_vs_log_ratio_family": {
+    "rho": 0.3706293706293707,
+    "ci95": [
+      -0.35714285714285715,
+      0.8429951005673028
+    ]
+  },
+  "axis_counts": {
+    "structure-family loss": 12
+  }
+}
