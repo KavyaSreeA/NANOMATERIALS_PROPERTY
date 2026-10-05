@@ -1,0 +1,309 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Honest Evaluation of Machine Learning for 2D-Material Stiffness</title>
+<link rel="stylesheet" href="node_modules/katex/dist/katex.min.css">
+<style>
+  @page { size: Letter; margin: 0.62in 0.62in 0.7in 0.62in; }
+  :root { --ink:#111; --muted:#444; --rule:#222; }
+  html { font-family: "Liberation Serif","Times New Roman",serif; font-size: 9.6pt; color: var(--ink); }
+  body { margin: 0; }
+  .title { font-family: "Liberation Sans","Helvetica",sans-serif; font-size: 20.5pt; line-height: 1.12; text-align: center; margin: 0.15in 0 0.14in; font-weight: 500; }
+  .authors { text-align: center; font-size: 11pt; margin: 0 0 0.04in; }
+  .affil { text-align: center; font-size: 8.8pt; color: var(--muted); margin-bottom: 0.14in; }
+  .abstract { font-family: "Liberation Sans","Helvetica",sans-serif; font-size: 8.3pt; line-height: 1.28; text-align: justify; margin: 0 0.22in 0.05in; }
+  .abstract b { font-weight: 700; }
+  .keys { font-family: "Liberation Sans","Helvetica",sans-serif; font-size: 8.3pt; margin: 0.06in 0.22in 0.1in; }
+  .divider { text-align: center; margin: 0.06in 0 0.1in; font-size: 9pt; }
+  .cols { column-count: 2; column-gap: 0.26in; text-align: justify; hyphens: auto; line-height: 1.22; }
+  h2 { font-family: "Liberation Sans","Helvetica",sans-serif; font-size: 9.6pt; font-weight: 700; letter-spacing: .02em; margin: 0.13in 0 0.05in; break-after: avoid; text-transform: none; }
+  h2 .sc { font-variant: small-caps; font-size: 10.4pt; }
+  h3 { font-family: "Liberation Sans","Helvetica",sans-serif; font-size: 9.1pt; font-weight: 700; margin: 0.09in 0 0.03in; break-after: avoid; }
+  p { margin: 0 0 0.06in; }
+  .ind { text-indent: 0.16in; }
+  ul.b, ol.b { margin: 0.02in 0 0.06in 0.18in; padding: 0; }
+  ul.b li, ol.b li { margin-bottom: 0.02in; }
+  .eq { display: flex; align-items: center; justify-content: space-between; margin: 0.03in 0 0.05in; break-inside: avoid; }
+  .eq .m { flex: 1; text-align: center; overflow: visible; }
+  .eq .n { width: 0.3in; text-align: right; font-size: 9.6pt; }
+  .katex-display { margin: 0 !important; }
+  .katex { font-size: 1.04em; }
+  figure { margin: 0.07in 0 0.09in; break-inside: avoid; text-align: center; }
+  figure img { max-width: 100%; }
+  figcaption { font-size: 8.2pt; line-height: 1.2; text-align: justify; margin-top: 0.03in; }
+  figcaption b { font-weight: 700; }
+  .wide { column-span: all; margin: 0.08in 0 0.1in; }
+  .tbl { break-inside: avoid; margin: 0.06in 0 0.1in; }
+  .tbl.wide { column-span: all; }
+  td { white-space: nowrap; } td.l { white-space: normal; }
+  .tbl .cap { font-size: 8pt; text-align: center; font-variant: small-caps; letter-spacing: .02em; margin-bottom: 0.03in; }
+  .tbl .cap2 { font-size: 8pt; text-align: justify; margin-top: 0.03in; }
+  table { border-collapse: collapse; width: 100%; font-size: 7.7pt; line-height: 1.15; }
+  th, td { padding: 1.4px 3px; text-align: right; }
+  th { border-top: 1px solid var(--rule); border-bottom: 0.6px solid var(--rule); font-weight: 700; }
+  td:first-child, th:first-child { text-align: left; }
+  tr.last td { border-bottom: 1px solid var(--rule); }
+  tr.sep td { border-top: 0.5px solid #999; }
+  td.l, th.l { text-align: left; }
+  td.best { font-weight: 700; }
+  .small { font-size: 8.2pt; }
+  .refs { font-size: 7.9pt; line-height: 1.17; text-align: left; hyphens: manual; }
+  .refs div { padding-left: 0.28in; text-indent: -0.28in; margin-bottom: 0.03in; }
+  .note { font-style: italic; }
+  code { font-family: "DejaVu Sans Mono", monospace; font-size: 7.6pt; }
+  .fn { font-size: 7.6pt; color: var(--muted); }
+</style>
+</head>
+<body>
+
+<div class="title">Honest Evaluation of Machine Learning for 2D-Material Stiffness: Structure-Family Validation, Cross-Database Testing and Universal-Potential Calibration</div>
+<div class="authors">[Author Name(s)]</div>
+<div class="affil">[Department, Institution, City, Country] &nbsp;|&nbsp; [e-mail address]</div>
+
+<div class="abstract"><b>Abstract</b>&mdash;Machine-learning surrogates for density-functional-theory (DFT) elastic constants could screen thousands of two-dimensional (2D) materials, but most reported accuracies come from random train/test splits in which near-identical polymorphs and prototype relatives sit on both sides of the split. We ask how much of that accuracy survives when whole groups are held out. Using 7,258 mechanically stable C2DB monolayers, 141 composition and geometry descriptors (no DFT outputs) and a LightGBM regressor, we compare random, chemical-system and structure-family cross-validation. The mean absolute error (MAE) of the 2D Young's modulus is 13.8&nbsp;&plusmn;&nbsp;0.1&nbsp;N/m under random splitting and 13.9&nbsp;&plusmn;&nbsp;0.1&nbsp;N/m when chemical systems are held out, but 19.9&nbsp;&plusmn;&nbsp;0.2&nbsp;N/m (1.44&times;) when structure families are held out; adding prototype descriptors does not close this gap. Group-level ablations show that composition and geometry are complementary. Trained on all of C2DB, the model reaches MAE 19.0&nbsp;N/m and Spearman&nbsp;0.82 on 186 JARVIS-DFT materials, but 29.1&nbsp;N/m (Spearman&nbsp;0.73) on chemistries absent from C2DB; the two databases themselves differ by 8.6&nbsp;N/m on shared materials. Finally, we calibrate three universal interatomic potentials against monolayer DFT stiffness with a pre-set pass/fail gate: only MACE-MPA-0 passes, and only on C2DB. Bilayer labels and models are planned but have not been produced.</div>
+<div class="keys"><b><i>Index Terms</i></b>&mdash;2D materials, Young's modulus, stiffness tensor, data leakage, grouped cross-validation, gradient boosting, universal interatomic potentials</div>
+<div class="divider">&#10022;</div>
+
+<div class="cols">
+
+<h2>1&nbsp;&nbsp;<span class="sc">Introduction</span></h2>
+<p>Two-dimensional (2D) crystals are attractive for flexible electronics, membranes and composites, where in-plane stiffness decides whether a sheet survives handling and strain. Thousands of hypothetical 2D crystals can now be generated, but measuring the stiffness of each is impossible, and computing it from first principles is expensive: every material needs a relaxed reference cell plus several strained DFT calculations. Machine-learning (ML) surrogates trained on existing DFT results promise a much cheaper estimate and have been proposed for 2D materials [[venturi,fronzi]].</p>
+<p>How reliable are such surrogates on <i>new</i> materials? The common practice is to split a database at random into training and test rows. 2D databases contain many polymorphs and prototype relatives (for example MoS<sub>2</sub>, MoSe<sub>2</sub> and WS<sub>2</sub> share one structure type), so a random split puts close relatives of every test material into the training set. The reported error then partly measures recognition of a familiar structure type instead of prediction for an unfamiliar one. Evaluation strategies that hold out whole clusters or groups are well established in ecology and materials informatics [[roberts,meredig]], but we found none of the seven papers we reviewed that reports them for mechanical targets of 2D materials (Section&nbsp;2.3).</p>
+<p>This paper therefore treats <i>evaluation</i> as the object of study. We build a deliberately plain pipeline&mdash;DFT-free descriptors and three standard regressors&mdash;and stress it with progressively stricter tests. Our contributions are:</p>
+<ul class="b">
+<li>A cleaned set of 7,258 mechanically stable C2DB monolayers whose stability is derived from the stiffness tensor itself, not from database flags, with an audit of every filtering step (Section&nbsp;4.1).</li>
+<li>A leakage-aware comparison of random, cluster, chemical-system and structure-family cross-validation, with measured train/test overlap, five seeds and null baselines. Holding out structure families raises the MAE by 1.44&times;; holding out chemical systems does not raise it at all (Section&nbsp;4.3).</li>
+<li>Group-level feature ablations showing that composition and geometry are complementary and that prototype descriptors do not remove the gap (Section&nbsp;4.4).</li>
+<li>An external test on JARVIS-DFT with bootstrap intervals and a measured database-to-database disagreement floor (Section&nbsp;4.5).</li>
+<li>A pre-set-gate calibration of three universal interatomic potentials on monolayer stiffness, motivating (but not yet delivering) bilayer label generation (Section&nbsp;4.6).</li>
+</ul>
+<p>We state plainly at the outset what is <i>not</i> done: no bilayer stiffness has been computed or learned, no graph neural network or hyper-parameter search was run, and feature-level attribution (SHAP, permutation importance) was not performed.</p>
+
+<h2>2&nbsp;&nbsp;<span class="sc">Background and Related Work</span></h2>
+<h3>2.1&nbsp;&nbsp;Mechanical descriptors of a 2D sheet</h3>
+<p>For small in-plane strain a sheet obeys a linear stress&ndash;strain law written in Voigt notation with a 3&times;3 stiffness matrix over (xx, yy, xy). Because a sheet has no well-defined thickness, the stress is integrated over the cell height and the constants are quoted in N/m (force per unit edge length), not GPa. With <i>L<sub>z</sub></i> the full cell height including vacuum,</p>
+<div class="eq"><div class="m">$$\sigma^{2D}_{i}=\sigma^{3D}_{i}\,L_z,\qquad C_{ij}=\frac{\partial\sigma^{2D}_i}{\partial\varepsilon_j}$$</div><div class="n">(1)</div></div>
+<p>and the in-plane Young's modulus and Poisson ratio follow from the xx and yy block:</p>
+<div class="eq"><div class="m">$$Y_{2D}=\frac{C_{11}C_{22}-C_{12}^{2}}{C_{22}},\qquad \nu=\frac{C_{12}}{C_{22}}.$$</div><div class="n">(2)</div></div>
+<p>N/m scales with the number of layers whereas GPa does not, so any monolayer&ndash;bilayer comparison must state whether a value is per layer or for the whole slab; in this paper every row is a single layer (<i>n</i><sub>layers</sub>&nbsp;=&nbsp;1), so the two coincide.</p>
+
+<h3>2.2&nbsp;&nbsp;Traditional routes to stiffness</h3>
+<p><b>Experiment.</b> Stiffness of suspended sheets is measured by nanoindentation or from the nonlinear response of drum resonators, for which the Duffing equation relates the resonance curves to Young's modulus [[davidovikj]]. Experimental values for the best-studied sheets carry large spreads: a review table lists graphene at 1000&nbsp;&plusmn;&nbsp;100&nbsp;GPa and monolayer MoS<sub>2</sub> at 270&nbsp;&plusmn;&nbsp;100&nbsp;GPa [[zhang]]. Samples must be exfoliated or grown first, which is impractical for hypothetical materials.</p>
+<p><b>Classical molecular dynamics (MD).</b> Atomistic nanoindentation or tensile simulations with empirical potentials are fast, and have been used for graphene/MoS<sub>2</sub> heterostructures [[elder]] and for monolayer transition-metal dichalcogenides [[malakar]]. The potential must be parameterised for each chemistry, so results transfer poorly to new compositions.</p>
+<p><b>DFT finite-strain method.</b> The reference route, used to build C2DB, relaxes the sheet, applies small strains (&plusmn;1&nbsp;% in xx, yy and xy), relaxes the ions at each strained cell and reads the stress. With strain amplitude &delta; and the unit conversion &kappa;&nbsp;=&nbsp;16.0218&nbsp;N&nbsp;m<sup>&minus;1</sup> per eV&nbsp;&Aring;<sup>&minus;2</sup>, a central difference gives</p>
+<div class="eq"><div class="m">$$C_{ij}=\kappa\,L_z\,\frac{\sigma_i(+\delta)-\sigma_i(-\delta)}{2\delta},\ \ \delta=0.01 .$$</div><div class="n">(3)</div></div>
+<p>Each material therefore needs one reference relaxation and six strained relaxations. Accurate, general and slow: this cost is what a surrogate tries to avoid.</p>
+
+<h3>2.3&nbsp;&nbsp;Machine learning and how it was validated</h3>
+<p>Table&nbsp;I summarises the seven papers that formed our reading list. It is a reading list, not a systematic review, and supports statements only about the papers themselves.</p>
+<div class="tbl"><div class="cap">Table I &mdash; Prior work reviewed and its validation split</div>
+<table>
+<tr><th class="l">Study</th><th class="l">Data / model</th><th class="l">Validation split</th></tr>
+<tr><td class="l">Venturi et al. [[venturi]]</td><td class="l">C2DB (&asymp;3,500 entries); 100-model CGCNN ensemble; formation energy, band gap, stiffness constants</td><td class="l">Random 70&nbsp;% per model; parity plots over all of C2DB, including training points</td></tr>
+<tr><td class="l">Fronzi et al. [[fronzi]]</td><td class="l">Bilayers; 282 interlayer-energy and 226 <i>C</i><sub>33</sub> DFT labels; Bayesian NN</td><td class="l">K-means cluster-stratified 75/25 (in-domain by design)</td></tr>
+<tr><td class="l">Malakar et al. [[malakar]]</td><td class="l">1,440 MD runs on four TMDs; FFNN and LSTM</td><td class="l">Train/val/test ratio not stated; test samples from the same four materials</td></tr>
+<tr><td class="l">Maurizi et al. [[maurizi]]</td><td class="l">Continuum FE composites and lattices; GNN</td><td class="l">Random 90/10</td></tr>
+<tr class="last"><td class="l">Elder; Davidovikj; Zhang [[elder,davidovikj,zhang]]</td><td class="l">MD / experiment / review (no ML)</td><td class="l">&mdash;</td></tr>
+</table></div>
+<p>All ML studies in Table&nbsp;I use random splits or splits that keep test data similar to training data. Their reported accuracies are valid for interpolation within a known family, but they do not quantify extrapolation to unseen structure types. Closest to our target, Fronzi et&nbsp;al. predict bilayer interlayer energy and the out-of-plane constant <i>C</i><sub>33</sub> (test <i>R</i><sup>2</sup>&asymp;0.80) [[fronzi]]; in-plane bilayer stiffness is not covered. Our work does not claim to be first in any of these areas; it adds a stricter, quantified evaluation for in-plane monolayer stiffness and an honest account of what universal potentials can currently supply.</p>
+
+<h2>3&nbsp;&nbsp;<span class="sc">Proposed Method</span></h2>
+<h3>3.1&nbsp;&nbsp;Data and mechanical-stability filtering</h3>
+<p>The training source is C2DB [[haastrup,gjerding]] (GPAW [[mortensen]], PBE [[pbe]]); the external source is the 2D subset of JARVIS-DFT [[choudhary20,choudhary18]] (VASP [[kresse]], OptB88vdW [[klimes]]). From each stiffness file we form the symmetrised 3&times;3 (xx, yy, xy) matrix <b>C</b> and keep a material only if it is finite, positive definite and nearly symmetric:</p>
+<div class="eq"><div class="m">$$\begin{gathered}\lambda_{\min}\!\left(\tfrac12(\mathbf C+\mathbf C^{\!\top})\right)>0,\\[2pt] \frac{\max_{ij}|C_{ij}-C_{ji}|}{\max_{ij}|C_{ij}|}\le 0.10 .\end{gathered}$$</div><div class="n">(4)</div></div>
+<p>Positive definiteness is required because a sheet that does not resist stretching in every direction is mechanically unstable; excess asymmetry flags noisy or poorly converged calculations. Stability is derived from the tensor, never from the database's own label. For JARVIS only the xx, yy block is used (<i>C</i><sub>11</sub>, <i>C</i><sub>22</sub> &gt; 0 and positive determinant), because its shear entries did not reproduce known MoS<sub>2</sub> values; corrupt tensors (NaN or denormal numbers) are dropped, not repaired. For the Poisson task rows with |&nu;|&nbsp;&gt;&nbsp;1 are removed.</p>
+
+<h3>3.2&nbsp;&nbsp;Groups used for splitting</h3>
+<p>Two grouping keys are defined for every row. The <i>chemical system</i> is the sorted set of elements (MoS<sub>2</sub>&nbsp;&rarr;&nbsp;Mo&ndash;S). The <i>structure family</i> joins the anonymised formula (which hides the element identities, so MoS<sub>2</sub> and WSe<sub>2</sub> both become AB<sub>2</sub>) with the layer-group number:</p>
+<div class="eq"><div class="m">$$\begin{gathered}k_{\mathrm{chem}}=\mathrm{sorted}\big(\{\text{elements}\}\big),\\ k_{\mathrm{fam}}=\mathrm{anon}(\text{formula})\,\Vert\,\text{lg}\,N_{\mathrm{lg}} .\end{gathered}$$</div><div class="n">(5)</div></div>
+<p>The clean set contains 3,806 chemical systems (2,572 of them with a single member) and 676 families; the largest family has 432 rows. Polymorphs are kept as separate rows and not deduplicated, which is precisely why family-level grouping matters.</p>
+
+<h3>3.3&nbsp;&nbsp;Descriptors</h3>
+<p>Each material is described by 141 numbers: <b>132 composition</b> descriptors from the Magpie preset [[ward16]] computed with matminer [[ward18]] and pymatgen [[ong]], and <b>9 structural</b> descriptors (lattice lengths <i>a</i>, <i>b</i>, angle &gamma;, area per atom, atom count, slab thickness <i>z</i><sub>extent</sub>, <i>n</i><sub>layers</sub>, space-group number, and number of distinct elements). In the matminer implementation, Magpie summarises 22 elemental properties with six composition-weighted statistics each (22&times;6&nbsp;=&nbsp;132); for an element property <i>p</i> and atomic fractions <i>x<sub>i</sub></i> the mean and mean absolute deviation are</p>
+<div class="eq"><div class="m">$$\bar p=\sum_i x_i\,p_i,\qquad \langle|\Delta p|\rangle=\sum_i x_i\,|p_i-\bar p| ,$$</div><div class="n">(6)</div></div>
+<p>alongside the minimum, maximum, range and mode. Because Magpie depends only on the reduced formula, two polymorphs share identical composition descriptors; the geometric descriptors are what separate them. In the present data <i>n</i><sub>layers</sub> is constant (=1) and carries no information. DFT outputs (energy above hull, formation energy, band gap, stability labels) are deliberately excluded: they require a calculation to obtain, so a model using them could not score a genuinely new material and would obscure what composition and geometry alone can explain.</p>
+
+<h3>3.4&nbsp;&nbsp;Models and target transform</h3>
+<p>Stiffness is strongly right-skewed (median 47.9, mean 66.6, maximum 713.6&nbsp;N/m), so the model is fitted to <i>z</i>&nbsp;=&nbsp;ln&nbsp;<i>Y</i><sub>2D</sub> and predictions are mapped back with exp(&middot;); this makes a given <i>relative</i> error cost the same for soft and stiff sheets. The Poisson ratio can be zero or negative and is not transformed. Three regressors from scikit-learn [[pedregosa]] and LightGBM [[ke]] are used with fixed, untuned settings: ridge regression [[hoerl]] with the penalty chosen by internal cross-validation,</p>
+<div class="eq"><div class="m">$$\hat{\mathbf w}=\arg\min_{\mathbf w}\ \|\mathbf z-\mathbf X\mathbf w\|_2^2+\alpha\|\mathbf w\|_2^2 ;$$</div><div class="n">(7)</div></div>
+<p>a random forest [[breiman]] (300 trees, one third of the features per split); and LightGBM gradient-boosted trees [[ke]] (500 trees, learning rate 0.05, 31 leaves, 80&nbsp;% row and 50&nbsp;% column subsampling), an additive model</p>
+<div class="eq"><div class="m">$$F_M(\mathbf x)=\sum_{m=1}^{M}\eta\,f_m(\mathbf x),\quad M=500,\ \eta=0.05 .$$</div><div class="n">(8)</div></div>
+<p>All pipelines impute missing values with the median. No hyper-parameter tuning and no neural network was used.</p>
+
+<h3>3.5&nbsp;&nbsp;Evaluation protocol</h3>
+<p>Five-fold cross-validation is run under four schemes: <b>random</b> (plain K-fold; comparison only), <b>cluster</b> (K-means with 20 clusters on standardised Magpie features, stratified so every cluster appears in train and test, following the idea of Fronzi et&nbsp;al. [[fronzi]]), <b>chemical-system</b> and <b>structure-family</b>. The two grouped schemes use stratified group K-fold on ten quantile bins of the target, which balances the target distribution across folds while keeping every group in a single fold. To make overlap explicit we measure, for each key <i>k</i>, the fraction of test rows whose key also occurs in training:</p>
+<div class="eq"><div class="m">$$L_k=\frac{1}{|\mathcal T|}\sum_{i\in\mathcal T}\mathbf 1\!\left[k_i\in\{k_j\}_{j\in\mathcal R}\right],$$</div><div class="n">(9)</div></div>
+<p>where $\mathcal T$ is the test fold and $\mathcal R$ the training rows. Performance is reported as the mean absolute error, the coefficient of determination (also in log space, which is stable under extrapolation), and the ratio of a grouped error to the random-split error:</p>
+<div class="eq"><div class="m">$$\begin{gathered}\mathrm{MAE}=\frac1n\sum_i|y_i-\hat y_i|,\qquad R^2=1-\frac{\sum_i(y_i-\hat y_i)^2}{\sum_i(y_i-\bar y)^2},\\[2pt] \mathcal R_s=\frac{\mathrm{MAE}_{s}}{\mathrm{MAE}_{\mathrm{random}}} .\end{gathered}$$</div><div class="n">(10)</div></div>
+<p>Everything is repeated for five seeds (42&ndash;46). Null baselines (global mean, chemical-system mean, family mean) show how much of a score is attributable to group identity alone. Feature ablations train the same LightGBM on subsets: all, composition only, structure only, space group only, geometry without space group, all without space group, and with layer-group or anonymous-formula one-hot columns added (categories with fewer than ten rows pooled).</p>
+
+<h3>3.6&nbsp;&nbsp;External validation on JARVIS</h3>
+<p>The model is trained on all clean C2DB rows and applied to the 186 clean JARVIS rows without any JARVIS label entering training. JARVIS rows are matched to C2DB materials by formula, atom count and lattice constants within 3&nbsp;% (a heuristic); this yields 106 <i>matched</i> rows (the material, or its twin, is in training) and 55 rows whose chemical system is absent from C2DB (<i>unseen chemistry</i>). Uncertainty is expressed with 95&nbsp;% bootstrap intervals [[efron]] over JARVIS rows, and ranking quality with the Spearman coefficient [[spearman]] (formula valid in the absence of ties):</p>
+<div class="eq"><div class="m">$$\begin{gathered}\rho=1-\frac{6\sum_i d_i^{2}}{n(n^{2}-1)},\\[2pt] d_i=\mathrm{rank}(y_i)-\mathrm{rank}(\hat y_i) .\end{gathered}$$</div><div class="n">(11)</div></div>
+<p>The agreement of the two databases on the 106 shared materials is measured the same way and serves as a noise floor for any cross-database comparison.</p>
+
+<h3>3.7&nbsp;&nbsp;Calibration of universal interatomic potentials</h3>
+<p>MACE-MP-0 (&ldquo;medium&rdquo;), MACE-MPA-0 (&ldquo;medium-mpa-0&rdquo;) [[batatia]] and CHGNet 0.3.0 [[deng]] are driven through ASE [[larsen]] to reproduce the DFT protocol of Eq.&nbsp;(3): in-plane cell and ions are relaxed (<i>F</i><sub>max</sub>&nbsp;=&nbsp;0.005&nbsp;eV/&Aring;, out-of-plane length fixed), then &plusmn;1&nbsp;% strains in xx, yy and xy are applied with ion relaxation. Each run first verifies that the analytic stress equals a finite-difference derivative of the energy (ratios 1.000&ndash;1.003 for all three models). The benchmark contains 150 C2DB monolayers (one random member from each of 150 randomly drawn families of the pool of 3,380 non-magnetic, E<sub>hull</sub>&nbsp;&le;&nbsp;0.1&nbsp;eV/atom, &le;12-atom monolayers in 395 families) and the 184 JARVIS rows with &le;24 atoms. A <b>gate</b> was fixed before looking at results: a potential passes only if</p>
+<div class="eq"><div class="m">$$\begin{gathered}\rho\ge 0.90\ \ \wedge\ \ \mathrm{MAE}\le 1.5\,\mathrm{MAE}_{\mathrm{DB}}=12.93\ \mathrm{N/m},\\[2pt] \mathrm{MAE}_{\mathrm{DB}}=8.62\ \mathrm{N/m}\ \text{(C2DB vs JARVIS labels)}.\end{gathered}$$</div><div class="n">(12)</div></div>
+<p>The thresholds are proposed standards, not physical constants. Dispersion (D3 [[grimme]]) can be switched on for the MACE interface in our code (it is not wired for CHGNet) but was not used in these stiffness runs.</p>
+
+<h2>4&nbsp;&nbsp;<span class="sc">Experimental Results</span></h2>
+<h3>4.1&nbsp;&nbsp;Dataset statistics</h3>
+<p>Fig.&nbsp;2 and Table&nbsp;II trace the cleaning. Of 16,905 C2DB entries, 8,462 have a stiffness file; 988 of these fail the positive-definiteness test and a further 216 the asymmetry test, leaving 7,258 (14.2&nbsp;% of the labelled rows removed). For JARVIS, 18 of 229 tensors are corrupt and 25 more are unstable in the xx, yy block, leaving 186.</p>
+</div><!-- /cols -->
+
+<figure class="wide"><img src="figures/fig1_workflow.png" style="width:100%">
+<figcaption><b>Fig. 1.</b> Workflow. Blue: data and model construction. Green: validation experiments completed. Orange: universal-potential calibration (monolayers only). The dashed grey box is planned work that has <i>not</i> been run.</figcaption></figure>
+
+<figure class="wide"><img src="figures/fig2_data_funnel.png" style="width:92%">
+<figcaption><b>Fig. 2.</b> Data attrition. (a) C2DB: from all entries to the 7,258 mechanically stable monolayers used for training and cross-validation. (b) JARVIS-DFT 2D: from 229 tensors to the 186 used as the external set. Source: <code>results/data_audit.json</code>.</figcaption></figure>
+
+<div class="cols">
+<div class="tbl"><div class="cap">Table II &mdash; Clean datasets (N/m)</div>
+<table>
+<tr><th class="l">Item</th><th>C2DB</th><th>JARVIS</th></tr>
+<tr><td class="l">Rows used</td><td>7,258</td><td>186</td></tr>
+<tr><td class="l">Chemical systems</td><td>3,806</td><td>&mdash;</td></tr>
+<tr><td class="l">Rows whose chem. system is in C2DB</td><td>&mdash;</td><td>131</td></tr>
+<tr><td class="l">Structure families</td><td>676</td><td>&mdash;</td></tr>
+<tr><td class="l">Median <i>Y</i><sub>2D</sub></td><td>47.9</td><td>71.1</td></tr>
+<tr><td class="l">Mean &plusmn; s.d.</td><td>66.6 &plusmn; 67.9</td><td>76.3 &plusmn; 57.2</td></tr>
+<tr class="last"><td class="l">Min &ndash; max</td><td>0.09 &ndash; 713.6</td><td>2.46 &ndash; 386.3</td></tr>
+</table></div>
+
+<h3>4.2&nbsp;&nbsp;Baselines (seed 42)</h3>
+<p>Table&nbsp;III compares the three regressors. The mean-prediction baseline has MAE&nbsp;42.4&nbsp;N/m. Ridge halves this (22.5), trees reduce it by about a third again (14.7 for the forest) and LightGBM is best in every scheme but only about 1&nbsp;N/m better than the forest. The strongly non-linear dependence therefore matters more than the choice between the two tree ensembles. The ridge family-split <i>R</i><sup>2</sup> of &minus;11.0 is a back-transformation artefact of a single fold (its log-space <i>R</i><sup>2</sup> is 0.36; five-fold mean 0.55), not a data error. The Poisson ratio is predicted poorly (LightGBM <i>R</i><sup>2</sup>&nbsp;=&nbsp;0.39 random, 0.14 family), so we do not use it further.</p>
+<div class="tbl wide"><div class="cap">Table III &mdash; Baselines, seed 42, MAE (N/m) / <i>R</i><sup>2</sup></div>
+<table style="width:78%;margin:0 auto">
+<tr><th class="l">Model</th><th>Random</th><th>Cluster</th><th>Chem. sys.</th><th>Family</th></tr>
+<tr><td class="l">Ridge</td><td>22.5 / 0.69</td><td>22.6 / 0.69</td><td>22.8 / 0.67</td><td>31.1 / &minus;11.0</td></tr>
+<tr><td class="l">Random forest</td><td>14.7 / 0.85</td><td>14.7 / 0.84</td><td>14.8 / 0.83</td><td>20.9 / 0.67</td></tr>
+<tr class="last"><td class="l">LightGBM</td><td class="best">13.7 / 0.87</td><td class="best">14.0 / 0.87</td><td class="best">13.9 / 0.86</td><td class="best">19.8 / 0.70</td></tr>
+<tr class="sep"><td class="l">Poisson, LightGBM (MAE / <i>R</i><sup>2</sup>)</td><td>0.111 / 0.39</td><td>0.111 / 0.39</td><td>0.109 / 0.42</td><td>0.140 / 0.14</td></tr>
+</table></div>
+
+<h3>4.3&nbsp;&nbsp;Random versus grouped validation</h3>
+<p><b>Overlap.</b> Fig.&nbsp;3 shows why the schemes differ. Under random splitting 96&nbsp;% of test rows have their structure family in training and 61&nbsp;% their chemical system. The chemical-system split drives chemical overlap to zero but leaves 96&nbsp;% family overlap; only the family split removes it (and keeps 59&nbsp;% chemical overlap).</p>
+<figure><img src="figures/fig3_leakage.png" style="width:98%">
+<figcaption><b>Fig. 3.</b> Measured leakage, Eq.&nbsp;(9): fraction of test rows (mean over folds) whose chemical system, formula or structure family also occurs in training.</figcaption></figure>
+<p><b>Accuracy.</b> Fig.&nbsp;4 and Table&nbsp;IV give five-seed results. LightGBM attains MAE 13.8&nbsp;&plusmn;&nbsp;0.1 (random), 13.9&nbsp;&plusmn;&nbsp;0.1 (chemical system) and 19.9&nbsp;&plusmn;&nbsp;0.2&nbsp;N/m (family); <i>R</i><sup>2</sup> of ln&nbsp;<i>Y</i><sub>2D</sub> falls from 0.80 to 0.68. The family/random ratio is 1.44&nbsp;&plusmn;&nbsp;0.02 (minimum 1.42 over seeds), 1.43 for the random forest, while the chemical-system ratio is 1.00&ndash;1.01 for both. The cluster scheme gives 1.02 (seed 42), as expected of an in-domain split.</p>
+</div>
+
+<figure class="wide"><img src="figures/fig4_cv_results.png" style="width:96%">
+<figcaption><b>Fig. 4.</b> Five-seed cross-validation (error bars: s.d. over seeds). (a) MAE of <i>Y</i><sub>2D</sub>. Holding out chemical systems leaves LightGBM unchanged; holding out structure families raises its error 1.44&times;. (b) <i>R</i><sup>2</sup> of ln&nbsp;<i>Y</i><sub>2D</sub>. The no-feature &ldquo;family mean&rdquo; baseline explains 46&nbsp;% of the variance when family members are shared and none when they are not.</figcaption></figure>
+
+<div class="cols">
+<div class="tbl"><div class="cap">Table IV &mdash; Five seeds, all 141 features</div>
+<table>
+<tr><th class="l">Model</th><th>Random</th><th>Chem.</th><th>Family</th><th>Fam./Rand.</th></tr>
+<tr><td class="l">Global mean</td><td>42.4</td><td>42.4</td><td>42.4</td><td>1.00</td></tr>
+<tr><td class="l">Family mean</td><td>27.0</td><td>27.0</td><td>42.4</td><td>1.57</td></tr>
+<tr><td class="l">Chem.-sys. mean</td><td>34.5</td><td>42.4</td><td>34.3</td><td>0.99</td></tr>
+<tr><td class="l">Random forest</td><td>14.6</td><td>14.7</td><td>20.8</td><td>1.43</td></tr>
+<tr class="last"><td class="l">LightGBM</td><td class="best">13.8</td><td class="best">13.9</td><td class="best">19.9</td><td>1.44</td></tr>
+</table>
+<div class="cap2">MAE in N/m. Seed s.d. is 0.1&ndash;0.2 for the learned models. It reflects split and model randomness only and understates the uncertainty from the fixed sample size.</div></div>
+
+<p><b>What this shows.</b> The random-split score is optimistic for unfamiliar structure types by roughly 44&nbsp;% in error, while the model remains well above the no-feature baselines (19.9 vs 42.4&nbsp;N/m). The chemical-system split, which one might expect to be the harder test, is not: removing the 61&nbsp;% chemical overlap changes nothing because 96&nbsp;% structural overlap remains. The inflation in this dataset therefore comes from structural similarity, not chemistry.</p>
+<p><b>Is the gap just missing features?</b> Three observations argue against it. (i) Giving the model the layer group and anonymous formula directly (Section&nbsp;4.4) leaves the ratio at 1.44&ndash;1.47. (ii) The family-mean baseline falls from <i>R</i><sup>2</sup>(ln)&nbsp;=&nbsp;0.46 to 0.00 once the family is unseen, i.e. identity alone explains the random-split gain but nothing beyond it. (iii) Composition-only LightGBM still reaches <i>R</i><sup>2</sup>(ln)&nbsp;=&nbsp;0.50 on unseen families, so transferable chemical signal exists; the remaining gap is the cost of extrapolating to new prototypes.</p>
+
+<h3>4.4&nbsp;&nbsp;Feature ablation</h3>
+<p>Fig.&nbsp;5 removes groups of descriptors. Composition only (19.2/25.5&nbsp;N/m, random/family) and structure only (19.8/26.6) perform almost identically, and combining them lowers the error by about 28&nbsp;% (13.8/19.9), so the two views are complementary though partly redundant. The space-group number alone is nearly uninformative (38.0/44.3&nbsp;N/m; worse than the 42.4&nbsp;N/m mean predictor under family CV), and removing it from the full model costs only 0.3&nbsp;N/m (14.1/20.2): the structural signal is carried by geometry. One-hot layer-group and anonymous-formula columns alone recover the family-mean baseline under random CV (<i>R</i><sup>2</sup>(ln) 0.455 vs 0.463) and nothing under family CV (0.06); added to the full set they change the MAE by &minus;0.2 to +0.1&nbsp;N/m, within one to three seed standard deviations, while the family/random ratio stays at 1.44&ndash;1.47.</p>
+</div>
+
+<figure class="wide"><div style="display:flex;justify-content:center"><img src="figures/fig5_ablation.png" style="width:52%"></div>
+<figcaption><b>Fig. 5.</b> Group-level ablation (LightGBM, five seeds; bars: random split, hatched: family split; error bars: s.d. over seeds). Dashed line: predict-the-mean error. Results indicate predictive contribution only, not physical causation.</figcaption></figure>
+
+<div class="cols">
+<p><b>Limits.</b> Ablation removes <i>groups</i> of columns, not single descriptors, and uses a single model; improvements below &asymp;0.3&nbsp;N/m are not distinguishable from noise. SHAP and permutation importance were not run, so we make no claim that any individual descriptor physically determines stiffness.</p>
+
+<h3>4.5&nbsp;&nbsp;Cross-database test on JARVIS</h3>
+<p>Fig.&nbsp;6 and Table&nbsp;V report the external test. On all 186 JARVIS rows LightGBM reaches MAE 19.0 [14.4, 24.5]&nbsp;N/m (95&nbsp;% bootstrap interval) with Spearman 0.82. On the 106 matched rows the error is 10.2 [7.9, 12.5] with Spearman 0.93&mdash;an optimistic figure, since the material is in training. On the 55 rows with chemistry absent from C2DB the error is 29.1 [20.5, 39.6] with Spearman 0.73 and <i>R</i><sup>2</sup>(ln) 0.45 [&minus;0.14, 0.75]; the lower end of this interval shows that the sample cannot rule out performance no better than the mean. The &ldquo;all&rdquo; row mixes leaky and non-leaky rows and is not a generalisation figure. Composition-only features collapse on unseen chemistry (<i>R</i><sup>2</sup>(ln) 0.06) while structure-only features hold (0.41), but the intervals overlap, so this is suggestive only.</p>
+</div>
+
+<figure class="wide"><img src="figures/fig6_jarvis_external.png" style="width:96%">
+<figcaption><b>Fig. 6.</b> LightGBM trained on C2DB, tested on JARVIS-DFT. (a) MAE with 95&nbsp;% bootstrap intervals; dashed: disagreement between the two databases&rsquo; own labels on 106 shared materials. (b) Spearman rank correlation.</figcaption></figure>
+
+<div class="cols">
+<div class="tbl"><div class="cap">Table V &mdash; JARVIS external test (LightGBM, all features)</div>
+<table>
+<tr><th class="l">Subset</th><th><i>n</i></th><th>MAE</th><th><i>R</i><sup>2</sup>(ln)</th><th>Spearman</th></tr>
+<tr><td class="l">All</td><td>186</td><td>19.0</td><td>0.55</td><td>0.82</td></tr>
+<tr><td class="l">Matched to C2DB</td><td>106</td><td>10.2</td><td>0.81</td><td>0.93</td></tr>
+<tr class="last"><td class="l">Unseen chemistry</td><td>55</td><td>29.1</td><td>0.45</td><td>0.73</td></tr>
+<tr class="sep"><td class="l">Label agreement, C2DB vs JARVIS</td><td>106</td><td>8.6</td><td>0.75</td><td>0.92</td></tr>
+</table></div>
+<p><b>Interpretation.</b> C2DB and JARVIS differ in code, functional and workflow, so even a perfect copy of C2DB would miss JARVIS by about 8.6&nbsp;N/m. On matched rows the model is close to that floor (10.2). On unseen chemistry its error is roughly 3.4 times the floor, so most of that error is genuine model error, although the floor was measured on matched (possibly easier) materials. The JARVIS unit is inferred (median ratio 1.04 to C2DB), so exact agreement can never be claimed. The model is therefore useful for <i>ranking</i> candidates but not for quoting absolute stiffness on new chemistry. Seed changes move the MAE by only 0.4&ndash;1.1&nbsp;N/m; sampling uncertainty from the small set dominates.</p>
+
+<h3>4.6&nbsp;&nbsp;Universal-potential calibration (monolayers)</h3>
+<p>Table&nbsp;VI and Fig.&nbsp;7 apply the gate of Eq.&nbsp;(12). MACE-MP-0 and CHGNet fail everywhere; both underestimate stiffness systematically (pooled slope through the origin 0.62 and 0.48; median predicted/DFT ratio 0.72 and 0.53). MACE-MPA-0 is the only passing combination: on the 150 C2DB monolayers it reaches Spearman 0.94 and MAE 9.9&nbsp;N/m (Fig.&nbsp;8). On JARVIS, however, it has Spearman 0.81 but MAE 77.5&nbsp;N/m, and its pooled MAE is 47.1; the cause was not diagnosed. No potential therefore qualifies as a validated label generator at this stage.</p>
+<div class="tbl"><div class="cap">Table VI &mdash; Potential vs DFT stiffness (gate: &rho; &ge; 0.90, MAE &le; 12.93)</div>
+<table>
+<tr><th class="l">Model</th><th>Subset</th><th><i>n</i></th><th>&rho;</th><th>MAE</th><th>Gate</th></tr>
+<tr><td class="l">MACE-MP-0</td><td>C2DB</td><td>150</td><td>0.83</td><td>19.3</td><td>fail</td></tr>
+<tr><td class="l"></td><td>JARVIS</td><td>184</td><td>0.76</td><td>35.4</td><td>fail</td></tr>
+<tr class="sep"><td class="l">MACE-MPA-0</td><td>C2DB</td><td>150</td><td class="best">0.94</td><td class="best">9.9</td><td class="best">pass</td></tr>
+<tr><td class="l"></td><td>JARVIS</td><td>184</td><td>0.81</td><td>77.5</td><td>fail</td></tr>
+<tr class="sep"><td class="l">CHGNet 0.3.0</td><td>C2DB</td><td>150</td><td>0.83</td><td>23.4</td><td>fail</td></tr>
+<tr class="last"><td class="l"></td><td>JARVIS</td><td>184</td><td>0.71</td><td>42.4</td><td>fail</td></tr>
+</table></div>
+</div>
+
+<figure class="wide"><img src="figures/fig7_mlip_gate.png" style="width:96%">
+<figcaption><b>Fig. 7.</b> Calibration of universal interatomic potentials against DFT monolayer stiffness. (a) MAE and (b) Spearman correlation per model and benchmark subset, with the pre-set gate thresholds (dashed).</figcaption></figure>
+
+<figure class="wide"><img src="figures/parity_Y2D_relaxed_cell.png" style="width:96%">
+<figcaption><b>Fig. 8.</b> Parity plots (log&ndash;log) of potential-derived against reference <i>Y</i><sub>2D</sub> for C2DB (blue) and JARVIS (orange) monolayers; grey band: gate MAE. Points below the diagonal reveal the systematic softening of MACE-MP-0 and CHGNet.</figcaption></figure>
+
+<figure class="wide"><img src="figures/error_hist_relaxed_cell.png" style="width:78%">
+<figcaption><b>Fig. 9.</b> Distribution of absolute (left) and relative (right) <i>Y</i><sub>2D</sub> errors of the three potentials (clipped for display).</figcaption></figure>
+
+<div class="cols">
+<h2>5&nbsp;&nbsp;<span class="sc">Discussion</span></h2>
+<p>Our central finding is methodological: in this dataset, accuracy depends far more on <i>what the test set shares with the training set</i> than on the choice of regressor. The two tree ensembles differ by only about 1&nbsp;N/m, whereas changing the split changes the MAE of the <i>same</i> model by about 6&nbsp;N/m. Reporting a random-split number alone would have hidden this. At the same time, the model keeps real skill on unfamiliar structure families (MAE 19.9 vs 42.4 for the mean predictor) and ranks JARVIS materials reasonably (Spearman 0.73&ndash;0.82), which is what a screening tool needs.</p>
+<p>The experiments also show where caution is needed. First, absolute values on unseen chemistry from another database can be off by roughly 30&nbsp;N/m, against typical stiffnesses of 50&ndash;70&nbsp;N/m. Second, the best-looking potential result (MACE-MPA-0 on C2DB) does not carry over to JARVIS, a reminder that a gate passed on one database is not a general licence to generate labels. Third, because the potentials were pretrained on large DFT collections of bulk crystals and some C2DB monolayers derive from layered bulk compounds, overlap between their training data and our benchmark has not been assessed.</p>
+
+<h3>5.1&nbsp;&nbsp;Limitations</h3>
+<ul class="b">
+<li>One training database, one DFT code and functional (C2DB: GPAW/PBE); the external set has only 186 rows, 55 of them unseen chemistry, with wide intervals.</li>
+<li>JARVIS units are inferred and the C2DB&ndash;JARVIS matching is a heuristic (formula, atom count, lattice within 3&nbsp;%).</li>
+<li>&ldquo;Family&rdquo; is our own definition (anonymous formula plus layer group); other definitions could give different gaps. Family sizes are uneven (up to 432 rows), so folds are lumpy.</li>
+<li>Seed standard deviations understate uncertainty from the fixed sample; polymorphs were not deduplicated.</li>
+<li>Models use fixed hyper-parameters; no graph neural network was tested; ablations are group-level and single-model; no SHAP or permutation analysis was run.</li>
+<li>The Poisson ratio is poorly predicted (<i>R</i><sup>2</sup> 0.39 random, 0.14 family).</li>
+<li>All data are monolayers. Nothing in this paper concerns bilayers or multilayers, out-of-plane constants, or bilayer binding energy; the BiDB files were not available and the corresponding code path is untested on real data.</li>
+</ul>
+
+<h3>5.2&nbsp;&nbsp;Future work</h3>
+<p>The next stage is a bilayer extension that is <i>planned but not yet performed</i>: enumerate stackings of homobilayers (starting from the pool of 3,380 screened monolayers), compute in-plane stiffness and interlayer binding energy with the best-validated potential (with a dispersion correction, to be tested), quantify uncertainty by comparing two potentials, and&mdash;if DFT access allows&mdash;spot-check a few bilayers. A decisive risk, recorded in our plan, is that the stacking-induced change in in-plane stiffness may be comparable to the potential error, in which case such labels could not support a stacking-dependence claim. If labels pass these gates, the same grouped-validation protocol (grouping by monolayer and chemical system) would be applied to a bilayer model. Heterobilayers, a graph-network comparison and hyper-parameter tuning remain open.</p>
+
+<h2>6&nbsp;&nbsp;<span class="sc">Conclusion</span></h2>
+<p>With 141 DFT-free descriptors, LightGBM predicts the 2D Young's modulus of C2DB monolayers with an MAE of 13.8&nbsp;N/m under random splitting, but 19.9&nbsp;N/m (1.44&times;) when structure families are held out, whereas holding out chemical systems costs nothing. On an independent database the model ranks materials well but is only roughly quantitative on new chemistry, and no universal potential yet passes our gate on both databases. Honest, group-aware evaluation should therefore precede any extension to bilayers.</p>
+
+<h2>7&nbsp;&nbsp;<span class="sc">Datasets, Licences and Credits</span></h2>
+<p>The raw databases are not redistributed in this work; only derived statistics, figures and code are. Table&nbsp;VII lists each resource, its role and how it must be credited. <span class="note">Licence terms were taken from the providers&rsquo; published statements as recalled at drafting time and could not be re-checked from the drafting environment; please confirm each entry on the provider&rsquo;s site before submission.</span></p>
+</div>
+
+<div class="tbl wide" style="column-span:all"><div class="cap">Table VII &mdash; Data resources, licences and required credit</div>
+<table>
+<tr><th class="l" style="width:11%">Resource</th><th class="l" style="width:25%">Role in this work</th><th class="l" style="width:30%">Provider / how to credit</th><th class="l" style="width:34%">Licence / terms (to be confirmed)</th></tr>
+<tr><td class="l"><b>C2DB</b><br>Computational 2D Materials Database</td><td class="l">Training and cross-validation data; stiffness tensors (GPAW/PBE), structures, layer groups. 8,462 stiffness records &rarr; 7,258 used.</td><td class="l">CAMD, Technical University of Denmark. Cite Haastrup <i>et al.</i>, 2D Mater. 5, 042002 (2018) [[haastrup]] and Gjerding <i>et al.</i>, 2D Mater. 8, 044002 (2021) [[gjerding]]. https://c2db.fysik.dtu.dk/</td><td class="l">Open data; to our recollection released under Creative Commons Attribution 4.0 (CC&nbsp;BY&nbsp;4.0), i.e. reuse with attribution. <b>Confirm on the C2DB site.</b></td></tr>
+<tr><td class="l"><b>JARVIS-DFT</b> (2D subset)</td><td class="l">External test only (never used for training); stiffness tensors (VASP/OptB88vdW). 229 records &rarr; 186 used.</td><td class="l">NIST (Choudhary, Tavazza and co-workers). Cite Choudhary <i>et al.</i>, npj Comput. Mater. 6, 173 (2020) [[choudhary20]] and, for elastic constants, Phys. Rev. B 98, 014107 (2018) [[choudhary18]]. https://jarvis-tools.readthedocs.io/</td><td class="l">Openly distributed by NIST (data via the JARVIS website/figshare; code under the NIST open-source licence). Attribution required; <b>confirm the exact data licence on the JARVIS/figshare record.</b></td></tr>
+<tr><td class="l"><b>BiDB</b> (bilayer database)</td><td class="l">Intended for bilayer binding energy/distance. <b>Not obtained and not used</b>; no result in this paper depends on it.</td><td class="l">Recorded in the project plan only; obtain the files and the provider&rsquo;s citation before any future use.</td><td class="l">Not applicable (not used).</td></tr>
+<tr class="last"><td class="l">Other links recorded</td><td class="l">HetDB (2dhub.org) and arXiv:2004.03025 appear in the project&rsquo;s link list. Not used in any reported experiment.</td><td class="l">&mdash;</td><td class="l">Not applicable (not used).</td></tr>
+</table>
+<div class="cap2">Reproducibility: all numbers and figures in this paper are produced from the project&rsquo;s result files (<code>mat-ml/results/</code>) by <code>paper/build/make_figures.py</code>. Software: Python&nbsp;3.11, scikit-learn&nbsp;1.9.1 [[pedregosa]], LightGBM&nbsp;4.7.0 [[ke]], pymatgen [[ong]], matminer&nbsp;0.10.1 [[ward18]], ASE&nbsp;3.29.0 [[larsen]], mace-torch&nbsp;0.3.16 [[batatia]], CHGNet&nbsp;0.4.2 [[deng]]. Fixed seed&nbsp;42 (robustness seeds&nbsp;42&ndash;46).</div></div>
+
+<div class="cols">
+<h2><span class="sc">Acknowledgments</span></h2>
+<p>[Funding sources, supervisors, computing resources.] The authors thank the maintainers of C2DB, JARVIS-DFT and the open-source packages listed above.</p>
+
+<h2><span class="sc">References</span></h2>
+<div class="refs">
+[[REFLIST]]
+</div>
+</div>
+
+</body>
+</html>
