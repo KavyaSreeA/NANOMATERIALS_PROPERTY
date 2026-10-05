@@ -6,3 +6,4 @@ mat-ml/results/_*.err
 Dataset/
 paper/build/node_modules/
 paper/build/package*.json
+paper/paper_bundle.zip
