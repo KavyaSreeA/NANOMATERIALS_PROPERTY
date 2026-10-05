@@ -35,7 +35,7 @@ in the training fold (Table 1), because this is what distinguishes the schemes. 
 
 ## 3.3 Random versus grouped evaluation
 Under random cross-validation LightGBM predicted Y2D with MAE 13.8 N/m (ln R2 0.80; R2 0.87). When whole structure families were held out, the MAE rose to 19.9 N/m
-(ln R2 0.68; R2 0.70), a factor of 1.44 +/- 0.02 (mean +/- s.d. over five random seeds; the smallest ratio in any seed was 1.42). The random forest behaved the same way
+(ln R2 0.68; R2 0.70), a factor of 1.44 (95% cluster-bootstrap interval 1.30-1.62, resampling whole structure families; the standard deviation over five random seeds, 0.02, understates the uncertainty because it holds the dataset fixed). The random forest behaved the same way
 (14.6 to 20.8 N/m; ratio 1.43 +/- 0.01). Holding out chemical systems, by contrast, made no measurable difference: MAE 13.9 N/m, a ratio of 1.00 +/- 0.01, even though 61% of
 the random-split test materials share their chemical system with the training data. The cluster-stratified split was likewise indistinguishable from random (14.0 N/m).
 In this dataset, therefore, random splits overestimate accuracy through overlap of structure families, not of chemistry (Table 2). Ridge regression was clearly worse

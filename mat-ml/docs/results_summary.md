@@ -61,7 +61,7 @@ Seed std is across the five seeds and reflects split and model randomness only; 
 sample size.
 
 Findings:
-1. **The family gap is robust:** 1.42-1.44x MAE in every seed for both strong models.
+1. **The family gap is robust to seeds and to resampling families:** 1.42-1.44x MAE in every seed for both strong models; a cluster bootstrap over structure families (`phaseC_cluster_bootstrap.json`) gives 1.44 with 95% CI 1.30-1.62, and 1.01 [0.99, 1.04] for chemical-system grouping. The seed standard deviations alone understate the uncertainty.
 2. **The chemical-system gap is zero:** removing the 61% of test rows that share a chemical system with training does not hurt (ratio 1.00-1.01; composition-only 0.97).
    Random-split inflation in this data comes from structure-family overlap, not from chemistry.
 3. **Both feature groups matter:** composition-only and structure-only each reach about 19-20 N/m; together 13.8 (about 28% lower).

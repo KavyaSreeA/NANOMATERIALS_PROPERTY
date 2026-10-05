@@ -1,0 +1,102 @@
+{
+  "included": [
+    {
+      "target": "hform",
+      "n": 16905,
+      "transform": "none",
+      "n_families": 1198,
+      "n_chemsys": 9380
+    },
+    {
+      "target": "ehull",
+      "n": 16905,
+      "transform": "none",
+      "n_families": 1198,
+      "n_chemsys": 9380
+    },
+    {
+      "target": "gap",
+      "n": 8699,
+      "transform": "none",
+      "n_families": 753,
+      "n_chemsys": 4269
+    },
+    {
+      "target": "gap_hse",
+      "n": 3363,
+      "transform": "log",
+      "n_families": 414,
+      "n_chemsys": 2194
+    },
+    {
+      "target": "evac",
+      "n": 8699,
+      "transform": "none",
+      "n_families": 753,
+      "n_chemsys": 4269
+    },
+    {
+      "target": "efermi",
+      "n": 8699,
+      "transform": "none",
+      "n_families": 753,
+      "n_chemsys": 4269
+    },
+    {
+      "target": "vbm",
+      "n": 4567,
+      "transform": "none",
+      "n_families": 566,
+      "n_chemsys": 2836
+    },
+    {
+      "target": "alphax_el",
+      "n": 5352,
+      "transform": "log",
+      "n_families": 410,
+      "n_chemsys": 2655
+    },
+    {
+      "target": "plasmafrequency_x",
+      "n": 3931,
+      "transform": "none",
+      "n_families": 228,
+      "n_chemsys": 1832
+    },
+    {
+      "target": "emass_cbm",
+      "n": 3532,
+      "transform": "log",
+      "n_families": 433,
+      "n_chemsys": 2479
+    },
+    {
+      "target": "Y2D",
+      "n": 7258,
+      "transform": "log",
+      "n_families": 676,
+      "n_chemsys": 3806
+    },
+    {
+      "target": "poisson",
+      "n": 7229,
+      "transform": "none",
+      "n_families": 675,
+      "n_chemsys": 3792
+    }
+  ],
+  "excluded": {
+    "number": "identifier / symmetry integer",
+    "lgnum": "identifier / symmetry integer",
+    "thickness": "purely geometric",
+    "energy": "extensive total energy",
+    "dipz": "degenerate (>50% at the modal value)",
+    "minhessianeig": "degenerate (>50% at the modal value)",
+    "magmom": "degenerate (>50% at the modal value)"
+  },
+  "rules": {
+    "min_labels": 3000,
+    "degenerate_share": 0.5,
+    "log_if_range_ratio_above": 100
+  }
+}

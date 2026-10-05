@@ -16,7 +16,7 @@ Everything below (data, features, models, formulas, scores and plots) is generat
 | **ML-potential validation** | Can a universal ML interatomic potential (MACE-MP-0, MACE-MPA-0, CHGNet) supply reliable stiffness and binding labels? | C2DB, JARVIS, BiDB references | (not learned here; checked against DFT) |
 
 **Headline findings**
-- Random cross-validation overestimates accuracy, and the cause is **structure-level overlap**: LightGBM Y2D MAE is 13.8 N/m under random CV and 19.9 N/m when whole structure families are held out (1.44 ± 0.02 over five seeds). Holding out chemical systems changes nothing (1.00×).
+- Random cross-validation overestimates accuracy, and the cause is **structure-level overlap**: LightGBM Y2D MAE is 13.8 N/m under random CV and 19.9 N/m when whole structure families are held out (MAE ratio 1.44; 95% CI 1.30–1.62 when whole families are resampled, see Phase C below). Holding out chemical systems changes nothing (ratio 1.01, CI 0.99–1.04).
 - For bilayer binding energy the inflation is larger: MAE 2.4 (random) vs 9.1 (new monolayers) vs 13.6 meV/Å² (new families), against 18.5 for the mean predictor.
 - On 186 JARVIS materials the ranking transfers (Spearman 0.82, 95% CI 0.72–0.90); for the 55 with chemistries absent from training, MAE is 29 N/m (95% CI 20–40).
 - MACE-MPA-0 reproduces BiDB binding-energy ranking and magnitude (Spearman 0.90, median ratio 1.10) but **fails the interlayer-gap criterion**; bilayer in-plane stiffness is consistent with additive layers in that model (median ratio 2.008, CI [1.95, 2.03]; not DFT-validated).
@@ -131,7 +131,7 @@ for ML-potential stiffness $C\,[\mathrm{N/m}]=\dfrac{\partial\sigma}{\partial\va
 | family | Random forest | 20.88 ± 2.52 | 36.42 | 0.670 | 0.669 |
 | family | **LightGBM** | **19.82 ± 2.78** | 34.07 | 0.703 | 0.681 |
 
-(The Ridge family R² of −11 comes from one fold whose ln-space extrapolation blew up after exponentiation; its ln R² is 0.554.) **Five seeds, LightGBM:** MAE 13.80 ± 0.11 (random), 13.86 ± 0.07 (chemical system), 19.90 ± 0.22 (family); family/random ratio 1.44 ± 0.02, chemical-system/random 1.00 ± 0.01. Baselines: mean of targets 42.4 N/m; family mean 27.0 (random split).
+(The Ridge family R² of −11 comes from one fold whose ln-space extrapolation blew up after exponentiation; its ln R² is 0.554.) **Five seeds, LightGBM:** MAE 13.80 ± 0.11 (random), 13.86 ± 0.07 (chemical system), 19.90 ± 0.22 (family); family/random ratio 1.44 ± 0.02 over seeds (but **95% CI 1.30–1.62 when families are resampled**; the seed spread understates the uncertainty), chemical-system/random 1.00 ± 0.01 over seeds (CI 0.99–1.04). Baselines: mean of targets 42.4 N/m; family mean 27.0 (random split).
 
 **Poisson ratio** (seed 42; MAE / R²): LightGBM 0.111 / 0.394 (random), 0.109 / 0.417 (chemical system), 0.140 / 0.139 (family); random forest 0.107 / 0.412, 0.105 / 0.440, 0.140 / 0.142; Ridge 0.144 / 0.109, 0.144 / 0.110, 0.152 / 0.034.
 
