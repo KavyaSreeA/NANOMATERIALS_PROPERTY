@@ -44,7 +44,30 @@ REFS = {
  "grimme": 'S. Grimme, J. Antony, S. Ehrlich, and H. Krieg, &ldquo;A consistent and accurate <i>ab initio</i> parametrization of density functional dispersion correction (DFT-D) for the 94 elements H&ndash;Pu,&rdquo; <i>J. Chem. Phys.</i>, vol. 132, p. 154104, 2010.',
  "spearman": 'C. Spearman, &ldquo;The proof and measurement of association between two things,&rdquo; <i>Am. J. Psychol.</i>, vol. 15, no. 1, pp. 72&ndash;101, 1904.',
  "efron": 'B. Efron, &ldquo;Bootstrap methods: Another look at the jackknife,&rdquo; <i>Ann. Statist.</i>, vol. 7, no. 1, pp. 1&ndash;26, 1979.',
+ "redundancy": 'K. Li, D. Persaud, K. Choudhary, B. DeCost, M. Greenwood, and J. Hattrick-Simpers, &ldquo;Exploiting redundancy in large materials datasets for efficient machine learning with less data,&rdquo; <i>Nat. Commun.</i>, vol. 14, p. 7283, 2023.',
+ "mdhit": 'Q. Li, N. Fu, S. S. Omee, and J. Hu, &ldquo;MD-HIT: Machine learning for material property prediction with dataset redundancy control,&rdquo; <i>npj Comput. Mater.</i>, 2024.',
+ "matfold": '&ldquo;MatFold: systematic insights into materials discovery models&rsquo; performance through standardized cross-validation protocols,&rdquo; software and preprint, https://github.com/d2r2group/MatFold (authors to be added).',
+ "dunn": 'A. Dunn, Q. Wang, A. Ganose, D. Dopp, and A. Jain, &ldquo;Benchmarking materials property prediction methods: the Matbench test set and Automatminer reference algorithm,&rdquo; <i>npj Comput. Mater.</i>, vol. 6, p. 138, 2020.',
+ "pakdel": 'S. Pakdel <i>et al.</i>, &ldquo;High-throughput computational stacking reveals emergent properties in natural van der Waals bilayers,&rdquo; <i>Nat. Commun.</i>, vol. 15, p. 932, 2024.',
+ "xie": 'T. Xie and J. C. Grossman, &ldquo;Crystal graph convolutional neural networks for an accurate and interpretable prediction of material properties,&rdquo; <i>Phys. Rev. Lett.</i>, vol. 120, p. 145301, 2018.',
+ "bimat": 'BiMat-ML (band-gap prediction on BiDB), arXiv:2606.01012 (as recorded in the project notes; authors and title to be completed).',
 }
+
+
+import pandas as pd
+_lab = {"hform": "hform", "ehull": "ehull", "gap": "gap (PBE)", "gap_hse": "gap (HSE)", "evac": "evac", "efermi": "efermi", "vbm": "vbm",
+        "alphax_el": "alphax_el", "plasmafrequency_x": "plasmafrequency_x", "emass_cbm": "emass_cbm", "Y2D": "<b><i>Y</i><sub>2D</sub></b>", "poisson": "Poisson &nu;"}
+_p = pd.read_csv(OUT.parent / "mat-ml" / "results" / "panel_summary.csv")
+_rows = []
+for _, r in _p.iterrows():
+    _rows.append(f'<tr><td class="l">{_lab[r.target]}</td><td>{int(r.n):,}</td><td>{int(r.n_families):,}</td>'
+                 f'<td>{r.ratio_family:.2f} [{r.ratio_family_lo:.2f}, {r.ratio_family_hi:.2f}]</td>'
+                 f'<td>{r.R_family:.2f} [{r.R_family_lo:.2f}, {r.R_family_hi:.2f}]</td>'
+                 f'<td>{r.ratio_chemsys:.2f}</td><td>{r.D_family:.2f}</td></tr>')
+_rows[-1] = _rows[-1].replace('<tr>', '<tr class="last">', 1)
+PANEL = ('<table style="width:88%;margin:0 auto"><tr><th class="l">Property</th><th><i>n</i></th><th>Families</th>'
+         '<th>MAE ratio, family / random</th><th>Skill retained <i>R</i><sub>fam</sub></th><th>Ratio, chem. sys.</th><th><i>D</i><sub>fam</sub></th></tr>'
+         + "".join(_rows) + '</table>')
 
 html = (HERE / "paper_template.html").read_text(encoding="utf-8")
 order = []
@@ -62,7 +85,8 @@ def cite(m):
     return "[" + "], [".join(str(n) for n in nums) + "]"
 
 
-body = re.sub(r"\[\[([a-z0-9, ]+)\]\]", lambda m: cite(m) if m.group(1) != "REFLIST" else m.group(0), html)
+body = html.replace("[[PANEL_TABLE]]", PANEL)
+body = re.sub(r"\[\[([a-z0-9, ]+)\]\]", lambda m: cite(m), body)
 reflist = "\n".join(f"<div>[{i + 1}] {REFS[k]}</div>" for i, k in enumerate(order))
 body = body.replace("[[REFLIST]]", reflist)
 unused = [k for k in REFS if k not in order]

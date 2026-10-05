@@ -10,6 +10,7 @@ import matplotlib
 
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
+import matplotlib.ticker
 import numpy as np
 import pandas as pd
 from matplotlib.patches import FancyBboxPatch
@@ -40,36 +41,39 @@ def save(fig, name):
 
 # ------------------------------------------------------------------ Fig. 1 workflow
 def fig_workflow():
-    fig, ax = plt.subplots(figsize=(7.1, 2.55))
-    ax.set_xlim(0, 100); ax.set_ylim(0, 36); ax.axis("off"); ax.grid(False)
+    fig, ax = plt.subplots(figsize=(7.1, 3.35))
+    ax.set_xlim(0, 100); ax.set_ylim(0, 48); ax.axis("off"); ax.grid(False)
 
     def box(x, y, w, h, title, body, fc="#eef3fa", ec="#2a78d6", ls="-"):
-        ax.add_patch(FancyBboxPatch((x, y), w, h, boxstyle="round,pad=0.25,rounding_size=1.0",
-                                    fc=fc, ec=ec, lw=0.9, ls=ls))
-        ax.text(x + w / 2, y + h - 2.1, title, ha="center", va="top", fontsize=7.6, weight="bold", color=INK)
-        ax.text(x + w / 2, y + h - 6.0, body, ha="center", va="top", fontsize=6.7, color=MUTED, linespacing=1.25)
+        ax.add_patch(FancyBboxPatch((x, y), w, h, boxstyle="round,pad=0.25,rounding_size=1.0", fc=fc, ec=ec, lw=0.9, ls=ls))
+        ax.text(x + w / 2, y + h - 1.9, title, ha="center", va="top", fontsize=7.4, weight="bold", color=INK)
+        ax.text(x + w / 2, y + h - 5.6, body, ha="center", va="top", fontsize=6.4, color=MUTED, linespacing=1.22)
 
-    def arrow(x1, y1, x2, y2, ls="-"):
-        ax.annotate("", xy=(x2, y2), xytext=(x1, y1),
-                    arrowprops=dict(arrowstyle="-|>", lw=0.9, color=INK, ls=ls, shrinkA=0, shrinkB=0))
+    def arrow(x1, y1, x2, y2, ls="-", col=INK):
+        ax.annotate("", xy=(x2, y2), xytext=(x1, y1), arrowprops=dict(arrowstyle="-|>", lw=0.9, color=col, ls=ls, shrinkA=0, shrinkB=0))
 
-    w, h, y1 = 18.2, 13.6, 20.5
-    box(1, y1, w, h, "C2DB monolayers", "16,905 entries\n8,462 with stiffness\n(GPAW / PBE)")
-    box(21.4, y1, w, h, "Tensor cleaning", "positive definite\nasymmetry $\\leq$ 10 %\n$\\Rightarrow$ 7,258 rows")
-    box(41.8, y1, w, h, "Features (141)", "132 Magpie composition\n9 geometry / symmetry\nno DFT outputs")
-    box(62.2, y1, w, h, "Models", "Ridge, Random forest,\nLightGBM (fixed\nhyper-parameters)")
-    box(82.6, y1, 16.4, h, "Grouped CV", "random, chem. system,\nstructure family;\n5 folds $\\times$ 5 seeds", fc="#e9f7f1", ec="#1baf7a")
+    w, h = 18.2, 12.6
+    y1, y2, y3 = 34.0, 18.0, 2.0
+    # row 1: construction
+    box(1, y1, w, h, "Data", "C2DB, JARVIS-DFT 2D,\nBiDB (10,192\nbilayers)")
+    box(21.4, y1, w, h, "Tensor cleaning", "positive definite,\nasymmetry $\\leq$ 10 %\n$\\Rightarrow$ 7,258 monolayers")
+    box(41.8, y1, w, h, "Features (141)", "132 Magpie + 9 geometry;\nno DFT outputs")
+    box(62.2, y1, w, h, "Models", "Ridge, random forest,\nLightGBM, CGCNN,\nnested-tuned LightGBM")
+    box(82.6, y1, 16.4, h, "Grouped CV", "random, chem. system,\nfamily; cluster-\nbootstrap CI", fc="#e9f7f1", ec="#1baf7a")
     for x in (19.2, 39.6, 60.0, 80.4):
         arrow(x + 0.4, y1 + h / 2, x + 2.0, y1 + h / 2)
-
-    y2 = 2.0
-    box(41.8, y2, w, h, "Feature ablation", "composition / geometry /\nspace group / prototype\n(group-level only)", fc="#e9f7f1", ec="#1baf7a")
-    box(62.2, y2, w, h, "External check", "train on C2DB, test on\nJARVIS-DFT (186 rows)\nbootstrap intervals", fc="#e9f7f1", ec="#1baf7a")
-    box(82.6, y2, 16.4, h, "MLIP calibration", "MACE-MP-0/-MPA-0,\nCHGNet vs DFT\n(monolayers only)", fc="#fdf0ea", ec="#eb6834")
-    box(1, y2, 38.6, h, "Planned, not yet run: bilayer labels", "stacking enumeration $\\rightarrow$ MLIP labels\n$\\rightarrow$ DFT spot check $\\rightarrow$ bilayer model", fc="#f6f6f4", ec=GREY, ls=(0, (3, 2)))
-    for x in (51.0, 71.4):
-        arrow(x, y1 - 0.4, x, y2 + h + 0.4)
-    arrow(91.0, y1 - 0.4, 91.0, y2 + h + 0.4)
+    # row 2: evaluation of the random-vs-grouped gap
+    box(1, y2, w, h, "Y2D case study", "5 seeds, ablations,\nnull baselines\n(Sec. 4.2 - 4.4)", fc="#e9f7f1", ec="#1baf7a")
+    box(21.4, y2, w, h, "12-property panel", "C2DB properties,\nfamily vs chem. system\n(Sec. 4.5)", fc="#e9f7f1", ec="#1baf7a")
+    box(41.8, y2, w, h, "Model class / tuning", "CGCNN vs LightGBM;\nnested group-aware\ntuning (Sec. 4.6)", fc="#e9f7f1", ec="#1baf7a")
+    box(62.2, y2, w, h, "Label-only forecast", "pre-specified test:\nforecast not supported\n(Sec. 4.7)", fc="#e9f7f1", ec="#1baf7a")
+    box(82.6, y2, 16.4, h, "Bilayers + JARVIS", "BiDB binding energy /\ngap; JARVIS external\n(Sec. 4.8 - 4.9)", fc="#e9f7f1", ec="#1baf7a")
+    arrow(91.0, y1 - 0.5, 91.0, y2 + h + 0.5)
+    arrow(10.1, y1 - 0.5, 10.1, y2 + h + 0.5)
+    # row 3: potentials + planned
+    box(1, y3, 56.0, h, "Universal potentials (Sec. 4.10-4.11)", "monolayer stiffness gate; fixed-cell diagnostic; interlayer binding\nwith / without D3; BiDB gate (gap criterion failed);\nbilayer / monolayer stiffness ratio $\\approx$ 2 (not DFT-validated)", fc="#fdf0ea", ec="#eb6834")
+    box(61.0, y3, 38.0, h, "Not done", "bilayer stiffness pilot or model, DFT check of\nbilayer stiffness, heterobilayers, prospective\ntest on an independent dataset", fc="#f6f6f4", ec=GREY, ls=(0, (3, 2)))
+    arrow(28.5, y2 - 0.5, 28.5, y3 + h + 0.5, col=GREY)
     save(fig, "fig1_workflow.png")
 
 
@@ -80,17 +84,23 @@ def fig_funnel():
     j = audit["jarvis"]["steps"]
     c_lab = ["C2DB folders", "has stiffness file", "finite tensor", "positive definite", "asymmetry $\\leq$ 10 %", "$Y_{2D}>0$ (final)"]
     c_val = [16905, c["with_stiffness"], c["finite_tensor"], c["positive_definite"], c["asymmetry_ok"], c["Y2D_positive"]]
-    j_lab = ["JARVIS tensors", "not corrupt", "stable xx,yy block (final)"]
+    j_lab = ["JARVIS tensors", "not corrupt", "stable xx,yy (final)"]
     j_val = [j["with_tensor_string"], j["with_tensor_string"] - j["corrupt_tensor"], j["stable_xx_yy_block"]]
-    fig, (a, b) = plt.subplots(1, 2, figsize=(7.1, 2.3), gridspec_kw={"width_ratios": [1.35, 1]})
-    for ax, lab, val, col, ttl in ((a, c_lab, c_val, C_RANDOM, "(a) C2DB (training)"), (b, j_lab, j_val, C_CHEM, "(b) JARVIS-DFT 2D (external)")):
+    b_lab = ["BiDB bilayers", "valid binding E", "valid gap"]
+    b_val = [10192, 9993, 10189]
+    fig, (a, b, e) = plt.subplots(1, 3, figsize=(7.1, 2.2), gridspec_kw={"width_ratios": [1.45, 1.0, 1.0]})
+    for ax, lab, val, col, ttl in ((a, c_lab, c_val, C_RANDOM, "(a) C2DB (training)"), (b, j_lab, j_val, C_CHEM, "(b) JARVIS-DFT 2D"),
+                                   (e, b_lab, b_val, C_FAM, "(c) BiDB (Task B)")):
         y = np.arange(len(val))[::-1]
         ax.barh(y, val, color=col, height=0.62)
-        ax.set_yticks(y); ax.set_yticklabels(lab)
+        ax.set_yticks(y); ax.set_yticklabels(lab, fontsize=7)
         for yi, v in zip(y, val):
-            ax.text(v + max(val) * 0.012, yi, f"{v:,}", va="center", fontsize=7.5, color=INK)
-        ax.set_xlim(0, max(val) * 1.18); ax.set_title(ttl, loc="left", color=INK)
-        ax.set_xlabel("number of materials"); ax.grid(axis="y", visible=False)
+            ax.text(v + max(val) * 0.015, yi, f"{v:,}", va="center", fontsize=7, color=INK)
+        ax.set_xlim(0, max(val) * 1.3); ax.set_title(ttl, loc="left", color=INK, fontsize=7.6)
+        ax.set_xlabel("number of materials", fontsize=7); ax.grid(axis="y", visible=False)
+        ax.xaxis.set_major_formatter(matplotlib.ticker.FuncFormatter(lambda v, p: f"{int(v):,}"))
+        ax.tick_params(axis="x", labelsize=6.5)
+    a.set_xticks([0, 5000, 10000, 15000]); b.set_xticks([0, 100, 200]); e.set_xticks([0, 5000, 10000])
     fig.tight_layout()
     save(fig, "fig2_data_funnel.png")
 
@@ -219,7 +229,7 @@ def fig_jarvis():
     b.set_ylabel("Spearman rank correlation  $\\uparrow$"); b.set_title("(b) Ranking quality", loc="left", color=INK)
     b.set_ylim(0, 1.05); b.grid(axis="x", visible=False)
     fig.tight_layout()
-    save(fig, "fig6_jarvis_external.png")
+    save(fig, "fig9_jarvis_external.png")
 
 
 # ------------------------------------------------------------------ Fig. 7 MLIP gate
@@ -248,8 +258,83 @@ def fig_mlip():
     b.set_ylabel("Spearman vs DFT  $\\uparrow$"); b.set_title("(b) Ranking", loc="left", color=INK); b.set_ylim(0.5, 1.0)
     b.legend(frameon=False, loc="upper right", fontsize=6.8, handlelength=1.4)
     fig.tight_layout()
-    save(fig, "fig7_mlip_gate.png")
+    save(fig, "fig10_mlip_gate.png")
+
+
+# ------------------------------------------------------------------ Fig. 6 panel
+def fig_panel():
+    d = pd.read_csv(RES / "panel_summary.csv").sort_values("ratio_family").reset_index(drop=True)
+    lab = {"hform": "hform", "ehull": "ehull", "gap": "gap (PBE)", "gap_hse": "gap (HSE)", "evac": "evac", "efermi": "efermi",
+           "vbm": "vbm", "alphax_el": "alphax_el", "plasmafrequency_x": "plasmafreq_x", "emass_cbm": "emass_cbm", "Y2D": "Y2D (stiffness)", "poisson": "Poisson ratio"}
+    fig, (a, b) = plt.subplots(1, 2, figsize=(7.1, 3.0), sharey=True)
+    y = np.arange(len(d))
+    a.hlines(y, d.ratio_family_lo, d.ratio_family_hi, color=C_FAM, lw=1.6)
+    a.plot(d.ratio_family, y, "o", color=C_FAM, ms=4.5, label="family / random")
+    a.hlines(y, d.ratio_chemsys_lo, d.ratio_chemsys_hi, color=C_CHEM, lw=1.2)
+    a.plot(d.ratio_chemsys, y, "s", color=C_CHEM, ms=3.8, label="chemical system / random")
+    a.axvline(1, color=INK, lw=0.8)
+    a.set_yticks(y); a.set_yticklabels([lab[t] for t in d.target], fontsize=7)
+    a.set_xlabel("MAE ratio, grouped / random (95 % CI)"); a.set_title("(a) Error inflation", loc="left", color=INK)
+    a.legend(frameon=False, loc="lower right", fontsize=6.6, handletextpad=0.3); a.grid(axis="y", visible=False)
+    b.hlines(y, d.R_family_lo, d.R_family_hi, color=C_FAM, lw=1.6)
+    b.plot(d.R_family, y, "o", color=C_FAM, ms=4.5)
+    b.hlines(y, d.R_chemsys_lo, d.R_chemsys_hi, color=C_CHEM, lw=1.2)
+    b.plot(d.R_chemsys, y, "s", color=C_CHEM, ms=3.8)
+    b.axvline(1, color=INK, lw=0.8)
+    b.set_xlabel("skill retained, $R=S_{\\mathrm{grouped}}/S_{\\mathrm{random}}$ (95 % CI)"); b.set_title("(b) Skill retained", loc="left", color=INK)
+    b.set_xlim(0.1, 1.08); b.grid(axis="y", visible=False)
+    fig.tight_layout()
+    save(fig, "fig6_panel.png")
+
+
+# ------------------------------------------------------------------ Fig. 7 model class and tuning
+def fig_models():
+    A = json.loads((RES / "phaseA_cgcnn_vs_lgbm.json").read_text())
+    T = json.loads((RES / "phaseC_tuning.json").read_text())
+    names = ["LightGBM\n(default)", "CGCNN\n(1 seed, untuned)", "LightGBM\n(nested tuning)"]
+    ratio = [A["ratio_family_over_random"]["lgbm"], A["ratio_family_over_random"]["cgcnn"], T["ratio_family_random_tuned"][0]]
+    lo = [A["ratio_family_over_random"]["lgbm_ci95"][0], A["ratio_family_over_random"]["cgcnn_ci95"][0], T["ratio_family_random_tuned"][1][0]]
+    hi = [A["ratio_family_over_random"]["lgbm_ci95"][1], A["ratio_family_over_random"]["cgcnn_ci95"][1], T["ratio_family_random_tuned"][1][1]]
+    mae_r = [A["MAE_N_per_m"]["random|lgbm"], A["MAE_N_per_m"]["random|cgcnn"], T["MAE_tuned_default"]["random"][0]]
+    mae_f = [A["MAE_N_per_m"]["family|lgbm"], A["MAE_N_per_m"]["family|cgcnn"], T["MAE_tuned_default"]["family"][0]]
+    fig, (a, b) = plt.subplots(1, 2, figsize=(7.1, 2.5))
+    x = np.arange(3); w = 0.34
+    b.bar(x - w / 2, mae_r, w, color=C_RANDOM, label="random split")
+    b.bar(x + w / 2, mae_f, w, color=C_FAM, hatch="//", edgecolor="white", lw=0.5, label="family split")
+    for xi, v in zip(x - w / 2, mae_r): b.text(xi, v + 0.5, f"{v:.1f}", ha="center", fontsize=6.8, color=INK)
+    for xi, v in zip(x + w / 2, mae_f): b.text(xi, v + 0.5, f"{v:.1f}", ha="center", fontsize=6.8, color=INK)
+    b.set_xticks(x); b.set_xticklabels(names, fontsize=7); b.set_ylabel("MAE of $Y_{2D}$ (N/m)  $\\downarrow$"); b.set_ylim(0, 27)
+    b.set_title("(b) Error", loc="left", color=INK); b.legend(frameon=False, loc="upper left", fontsize=6.8, handlelength=1.2); b.grid(axis="x", visible=False)
+    a.errorbar(x, ratio, yerr=[np.array(ratio) - np.array(lo), np.array(hi) - np.array(ratio)], fmt="o", color=INK, ms=4.5, capsize=3, lw=1.1)
+    for xi, r, l_, h_ in zip(x, ratio, lo, hi): a.text(xi + 0.12, r, f"{r:.2f}\n[{l_:.2f}, {h_:.2f}]", fontsize=6.4, va="center", color=INK)
+    a.axhline(1, color=INK, lw=0.8); a.set_xlim(-0.5, 2.75); a.set_ylim(0.9, 1.95)
+    a.set_xticks(x); a.set_xticklabels(names, fontsize=7); a.set_ylabel("MAE ratio, family / random (95 % CI)")
+    a.set_title("(a) The gap persists", loc="left", color=INK); a.grid(axis="x", visible=False)
+    fig.tight_layout()
+    save(fig, "fig7_models_tuning.png")
+
+
+# ------------------------------------------------------------------ Fig. 8 Task B (BiDB)
+def fig_taskb():
+    d = pd.read_csv(RES / "phaseC_cluster_bootstrap_metrics.csv")
+    fig, (a, b) = plt.subplots(1, 2, figsize=(7.1, 2.5))
+    spec = [("TaskB|binding_energy_zscan", a, "binding energy MAE (meV/$\\mathrm{\\AA}^2$)", 18.51, ["(a) Binding energy", ""]),
+            ("TaskB|distance", b, "interlayer gap MAE ($\\mathrm{\\AA}$)", 0.415, ["(b) Interlayer gap", ""])]
+    sch = [("random", "Random", C_RANDOM, ""), ("monolayer", "Grouped by\nmonolayer", C_CHEM, "\\\\"), ("family", "Grouped by\nstructure family", C_FAM, "//")]
+    for key, ax, ylab, mean_mae, (ttl, _) in spec:
+        sub = d[d.analysis == key].set_index("scheme")
+        for i, (sc, lab, col, hatch) in enumerate(sch):
+            r = sub.loc[sc]
+            ax.bar(i, r.MAE, 0.6, color=col, hatch=hatch, edgecolor="white", lw=0.5, yerr=[[r.MAE - r.MAE_lo], [r.MAE_hi - r.MAE]], error_kw=dict(lw=0.8, capsize=2.5))
+            ax.text(i, r.MAE * 0.5, f"{r.MAE:.3g}", ha="center", va="center", fontsize=7.5, color=INK,
+                    bbox=dict(boxstyle="round,pad=0.18", fc="white", ec="none", alpha=0.95))
+        ax.axhline(mean_mae, color=INK, lw=0.8, ls=(0, (3, 2)))
+        ax.text(-0.45, mean_mae * 1.02, "predict-the-mean", ha="left", va="bottom", fontsize=6.6, color=INK)
+        ax.set_xticks(range(3)); ax.set_xticklabels([x[1] for x in sch], fontsize=7); ax.set_ylabel(ylab + "  $\\downarrow$")
+        ax.set_title(ttl, loc="left", color=INK); ax.grid(axis="x", visible=False); ax.set_ylim(0, mean_mae * 1.18)
+    fig.tight_layout()
+    save(fig, "fig8_taskB_bidb.png")
 
 
 if __name__ == "__main__":
-    fig_workflow(); fig_funnel(); fig_leakage(); fig_cv(); fig_ablation(); fig_jarvis(); fig_mlip()
+    fig_workflow(); fig_funnel(); fig_leakage(); fig_cv(); fig_ablation(); fig_panel(); fig_models(); fig_taskb(); fig_jarvis(); fig_mlip()
