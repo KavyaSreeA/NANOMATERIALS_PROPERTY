@@ -8,6 +8,7 @@ paper/build/node_modules/
 paper/build/package*.json
 
 # web app
+webapp/.venv/
 webapp/frontend/node_modules/
 webapp/frontend/dist/
 mat-ml/models/taskA_reference.npz

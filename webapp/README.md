@@ -8,13 +8,16 @@ A screening aid for 2D-material stiffness. Enter a formula and cell geometry (or
 
 ## Run locally (PowerShell)
 
-```powershell
-# 1. backend (use the project environment; pin the versions the models were trained with)
-pip install -r webapp/backend/requirements.txt
-cd webapp/backend
-uvicorn app.main:app --port 8000
+Use a **separate** virtual environment for the app (Python 3.11 or newer). The training and MLIP environments pin other numpy/torch/scikit-learn versions and conflict with it. This script builds a clean one in `webapp/.venv` with the packages installed in the right order:
 
-# 2. frontend (second terminal)
+```powershell
+powershell -ExecutionPolicy Bypass -File webapp/setup_env.ps1
+
+# backend
+cd webapp/backend
+..\.venv\Scripts\python.exe -m uvicorn app.main:app --port 8000
+
+# frontend (second terminal)
 cd webapp/frontend
 npm install
 npm run dev          # http://localhost:5173 (proxies /api to port 8000)
