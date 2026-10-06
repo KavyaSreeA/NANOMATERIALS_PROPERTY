@@ -1,0 +1,67 @@
+{
+  "n_jarvis": 10,
+  "n_pooled": 22,
+  "P1_share_ratio_gt_1.05": 0.7,
+  "P1_share_ci_lo_gt_1": 1.0,
+  "P1_pass": false,
+  "P2_share_chemsys_ratio_lt_1.15": 0.7,
+  "P2_pass": true,
+  "P3_rho_J": 0.006060606060606061,
+  "P3_ci": [
+    -0.5802469135802469,
+    0.8666887417218541
+  ],
+  "P3_pass": true,
+  "P4_pooled_rho": -0.03670242800677584,
+  "P4_pooled_ci": [
+    -0.5119781961787692,
+    0.5074017679918198
+  ],
+  "P4_pass": true,
+  "exploratory_pooled_D_vs_log_ratio": {
+    "rho": 0.6747600225861097,
+    "ci95": [
+      0.2848044574159326,
+      0.8850532674939552
+    ],
+    "note": "not pre-registered as primary; secondary metric from the design"
+  },
+  "exploratory_J_D_vs_log_ratio": {
+    "rho": 0.7454545454545454,
+    "ci95": [
+      0.24123654733142985,
+      1.0
+    ]
+  },
+  "P5_shared_properties_ratio": {
+    "hform": [
+      1.4928575558446628,
+      1.4232064707514305
+    ],
+    "gap": [
+      1.5268369669150703,
+      1.3507377419793087
+    ]
+  },
+  "P5_pass": true,
+  "jarvis_below_1.05": [
+    {
+      "target": "n-powerfact",
+      "ratio_family": 1.037,
+      "ratio_family_lo": 1.011,
+      "ratio_family_hi": 1.291
+    },
+    {
+      "target": "ncond",
+      "ratio_family": 1.032,
+      "ratio_family_lo": 1.007,
+      "ratio_family_hi": 1.386
+    },
+    {
+      "target": "nkappa",
+      "ratio_family": 1.034,
+      "ratio_family_lo": 1.007,
+      "ratio_family_hi": 1.498
+    }
+  ]
+}

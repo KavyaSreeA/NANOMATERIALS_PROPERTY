@@ -1,0 +1,87 @@
+{
+  "included": [
+    {
+      "target": "formation_energy_peratom",
+      "n": 1103,
+      "transform": "none",
+      "n_families": 302,
+      "n_chemsys": 761
+    },
+    {
+      "target": "optb88vdw_bandgap",
+      "n": 1103,
+      "transform": "none",
+      "n_families": 302,
+      "n_chemsys": 761
+    },
+    {
+      "target": "epsx",
+      "n": 887,
+      "transform": "log",
+      "n_families": 261,
+      "n_chemsys": 640
+    },
+    {
+      "target": "avg_elec_mass",
+      "n": 678,
+      "transform": "none",
+      "n_families": 212,
+      "n_chemsys": 521
+    },
+    {
+      "target": "n-Seebeck",
+      "n": 806,
+      "transform": "none",
+      "n_families": 252,
+      "n_chemsys": 603
+    },
+    {
+      "target": "n-powerfact",
+      "n": 802,
+      "transform": "log",
+      "n_families": 250,
+      "n_chemsys": 601
+    },
+    {
+      "target": "ncond",
+      "n": 802,
+      "transform": "log",
+      "n_families": 250,
+      "n_chemsys": 601
+    },
+    {
+      "target": "nkappa",
+      "n": 802,
+      "transform": "log",
+      "n_families": 250,
+      "n_chemsys": 601
+    },
+    {
+      "target": "exfoliation_energy",
+      "n": 748,
+      "transform": "log",
+      "n_families": 245,
+      "n_chemsys": 589
+    },
+    {
+      "target": "spillage",
+      "n": 603,
+      "transform": "none",
+      "n_families": 202,
+      "n_chemsys": 472
+    }
+  ],
+  "excluded": {
+    "magmom_oszicar": "degenerate (>50% at the modal value)",
+    "epsy": "same property family as a kept target (dielectric)",
+    "epsz": "same property family as a kept target (dielectric)",
+    "magmom_outcar": "same property family as a kept target (magmom)",
+    "avg_hole_mass": "same property family as a kept target (mass)",
+    "p-Seebeck": "same property family as a kept target (seebeck)",
+    "p-powerfact": "same property family as a kept target (powerfact)",
+    "pcond": "same property family as a kept target (cond)",
+    "pkappa": "same property family as a kept target (kappa)"
+  },
+  "n_materials": 1103,
+  "family_definition": "anonymous formula + space-group number"
+}

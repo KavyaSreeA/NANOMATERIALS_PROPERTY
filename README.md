@@ -5,7 +5,7 @@ Everything below (data, features, models, formulas, scores and plots) is generat
 
 **Contents**
 1. [What was done](#1-what-was-done) · 2. [Data and preprocessing](#2-data-and-preprocessing) · 3. [Features and targets](#3-features-and-targets) · 4. [Feature selection](#4-feature-selection-methods) · 5. [Models](#5-models)
-6. [Evaluation design](#6-evaluation-design) · 7. [Metrics and formulas](#7-metrics-and-formulas) · 8. [Results: Task A](#8-results-task-a-monolayer-stiffness) · 9. [Results: Task B](#9-results-task-b-bilayer-interlayer-labels)
+6. [Evaluation design](#6-evaluation-design) · 7. [Metrics and formulas](#7-metrics-and-formulas) · 8. [Results: Task A](#8-results-task-a-monolayer-stiffness) · 9. [Results: Task B](#9-results-task-b-bilayer-interlayer-labels) · 9b. [Is it general? Panel, GNN, tuning](#9b-is-the-family-penalty-general-property-panel-graph-network-tuning)
 10. [ML-potential validation](#10-ml-potential-validation) · 11. [Limitations](#11-limitations-and-what-is-not-established) · 12. [Reproduce](#12-reproduce) · 13. [Data sources and licence](#13-data-sources-and-licence)
 
 ## 1. What was done
@@ -16,7 +16,8 @@ Everything below (data, features, models, formulas, scores and plots) is generat
 | **ML-potential validation** | Can a universal ML interatomic potential (MACE-MP-0, MACE-MPA-0, CHGNet) supply reliable stiffness and binding labels? | C2DB, JARVIS, BiDB references | (not learned here; checked against DFT) |
 
 **Headline findings**
-- Random cross-validation overestimates accuracy, and the cause is **structure-level overlap**: LightGBM Y2D MAE is 13.8 N/m under random CV and 19.9 N/m when whole structure families are held out (MAE ratio 1.44; 95% CI 1.30–1.62 when whole families are resampled, see Phase C below). Holding out chemical systems changes nothing (ratio 1.01, CI 0.99–1.04).
+- Random cross-validation overestimates accuracy, and the cause is **structure-level overlap**: LightGBM Y2D MAE is 13.8 N/m under random CV and 19.9 N/m when whole structure families are held out (MAE ratio 1.44; 95% CI 1.30–1.62 when whole families are resampled, see section 9b). Holding out chemical systems changes nothing (ratio 1.01, CI 0.99–1.04).
+- The family penalty is **general**, not a stiffness quirk: it appears for all 12 C2DB properties tested and for all 10 JARVIS-2D properties in a pre-registered replication (7 of 10 above the 1.05 threshold; three transport properties near 1.03), and it survives a graph network and nested tuning. A label-only statistic does **not** forecast the loss (pre-registered test failed, ρ ≈ 0). See [section 9b](#9b-is-the-family-penalty-general-property-panel-graph-network-tuning).
 - For bilayer binding energy the inflation is larger: MAE 2.4 (random) vs 9.1 (new monolayers) vs 13.6 meV/Å² (new families), against 18.5 for the mean predictor.
 - On 186 JARVIS materials the ranking transfers (Spearman 0.82, 95% CI 0.72–0.90); for the 55 with chemistries absent from training, MAE is 29 N/m (95% CI 20–40).
 - MACE-MPA-0 reproduces BiDB binding-energy ranking and magnitude (Spearman 0.90, median ratio 1.10) but **fails the interlayer-gap criterion**; bilayer in-plane stiffness is consistent with additive layers in that model (median ratio 2.008, CI [1.95, 2.03]; not DFT-validated).
@@ -183,6 +184,18 @@ C2DB and JARVIS differ by 8.6 N/m MAE even on the *same* 106 materials, a floor 
 ![Task B gap diagnostics](mat-ml/results/diagnostics/taskB_distance_parity_residuals.png)
 *Figure 10. Interlayer-gap parity and residuals.*
 
+## 9b. Is the family penalty general? Property panel, graph network, tuning
+Pre-registered designs for each step are in [`mat-ml/results/`](mat-ml/results/) (`panel_design.md`, `phaseA_design.md`, `phaseC_design.md`, `panel_replication_design.md`), written before the corresponding models were fitted. A paper draft is in [`paper/manuscript_draft.md`](paper/manuscript_draft.md).
+
+**Property panel (C2DB, 12 properties, LightGBM, 3 seeds, cluster-bootstrap CIs).** Every property loses accuracy on unseen structure families (MAE ratio 1.12–1.92, all CIs above 1) while holding out chemical systems changes almost nothing (0.99–1.10). A **JARVIS-DFT 2D replication** (10 properties, predictions written first) found the penalty in all ten with CIs above 1, but only seven exceed the pre-registered 1.05 threshold: n-power factor, n-conductivity and n-κ are near 1.03 (prediction P1 **failed**, reported as such).
+
+![Family penalty per property](mat-ml/results/figures/fig8_family_penalty_panel.png)
+*Figure 15. MAE ratio of family-grouped (circles, with 95% CI over families) and chemical-system-grouped (squares) to random CV, per property, in C2DB and in the JARVIS-2D replication.*
+
+**A label-only forecast of the penalty failed.** The skill of a family-mean predictor under random CV (D_family) does not predict how much skill a property retains on unseen families: Spearman ρ = 0.00 [−0.60, 0.81] (C2DB), 0.01 (JARVIS), −0.04 [−0.51, 0.51] (pooled 22 properties); the pre-registered success criterion was ρ ≤ −0.6 with a CI below 0. (Exploratory, not primary: D_family correlates positively with the MAE *ratio*, ρ = 0.67 pooled, which is partly built into the definitions.)
+
+**Not a model artefact.** A CGCNN-type graph network (3 seeds, same folds) reaches a family/random ratio of 1.34–1.43 (3-seed ensemble 1.44 [1.33, 1.55] versus LightGBM 1.44 [1.29, 1.62]) and no better MAE. Nested, group-aware hyper-parameter tuning (inner CV with the same grouping as the outer split) lowers random-split Y2D MAE by 6% (13.74 → 12.86) but family-split MAE by 0% (19.82 → 19.83), so the ratio rises to 1.54 [1.37, 1.77]. For BiDB binding energy tuning gains are small and not distinguishable from zero (2.43 → 2.33, 9.37 → 8.83, 13.80 → 13.75 meV/Å²). Details: `phaseA_cgcnn_vs_lgbm.json`, `phaseA_cgcnn_seeds.json`, `phaseC_tuning.json`, `phaseC_tuning_taskb.json`, `phaseC_cluster_bootstrap.json`, `panel_summary*.csv`, `panel_hypotheses*.json`, `panel_replication_checks.json`.
+
 ## 10. ML-potential validation
 All thresholds were fixed in writing before the corresponding results existed (`mat-ml/results/mlip/*preregistration.md`); failures are reported as failures.
 
@@ -212,19 +225,25 @@ Full record: [`mlip_calibration.md`](mat-ml/docs/mlip_calibration.md). Bugs foun
 
 ## 11. Limitations and what is not established
 - One training database and one external set (186 JARVIS materials); labels for Task B come from one DFT workflow (PBE-D3, rigid layers, homobilayers only); the uid map is verified at formula level only.
-- No hyper-parameter tuning, tabular models only, no separate held-out test set; seed and fold standard deviations do not include the uncertainty from the finite number of materials.
-- **Not established:** DFT-validated bilayer stiffness; behaviour for magnetic, metallic or strongly bonded layers; whether a graph neural network would narrow the family gap; the meaning of BiDB's `binding_energy_gs`.
+- Tuning was a 13–17-configuration random search; the graph network is untuned with hand-chosen node features; no separate held-out test set. Seed standard deviations exclude the uncertainty from the finite number of materials, so the headline intervals are cluster bootstraps over families.
+- The JARVIS replication uses a coarser family (anonymous formula + space-group number) and about 1,100 materials; the mechanism behind the family penalty is not analysed.
+- **Not established:** DFT-validated bilayer stiffness; behaviour for magnetic, metallic or strongly bonded layers; the meaning of BiDB's `binding_energy_gs`.
 
 ## 12. Reproduce
 ```
 cd mat-ml
 pip install -r requirements.txt
-python -m pytest tests -q            # 13 fast tests
+python -m pytest tests -q            # 17 fast tests
 python -m src.train --task A         # Task A grid (~17 min)
 python -m src.train --task B         # Task B (~1 h)
 python -m src.diagnostics            # parity / residual plots + reproduction check
 python -m src.make_figures           # the summary figures in this README
 python -m src.save_models            # final models + model cards
+python -m src.panel && python -m src.panel_analysis                      # C2DB property panel (~2 h)
+python -m src.panel_jarvis && python -m src.panel_analysis --oof panel_oof_jarvis --tag jarvis && python -m src.panel_replication_checks
+python -m src.phasec_bootstrap; python -m src.phasec_tuning && python -m src.phasec_tuning_analysis; python -m src.phasec_tuning_taskb && python -m src.phasec_tuning_taskb_analysis
+python -m src.make_paper_figures
+# graph network (GPU env .venv-mlip): python -m src.gnn.make_folds; python -m src.gnn.cgcnn [--seed 43 --tag _s43]; python -m src.gnn.analysis; python -m src.gnn.analysis_seeds
 ```
 Every number above comes from files in [`mat-ml/results/`](mat-ml/results/) (`headline_metrics.md` has MAE, RMSE, R², ln R² for every configuration). The ML-potential work needs a separate GPU environment (see `mlip_calibration.md`).
 

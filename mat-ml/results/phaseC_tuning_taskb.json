@@ -1,0 +1,69 @@
+{
+  "target": "binding_energy_zscan, mono_stiffness features, LightGBM",
+  "MAE_tuned_default": {
+    "random": [
+      2.334033647762893,
+      2.428297150944644
+    ],
+    "monolayer": [
+      8.833880785197172,
+      9.366592332893324
+    ],
+    "family": [
+      13.74864122478925,
+      13.798027279744844
+    ]
+  },
+  "ratio_family_random_tuned": [
+    5.89050686478618,
+    [
+      3.9922810335736654,
+      8.732527086910093
+    ]
+  ],
+  "ratio_family_random_default": [
+    5.682182378041008,
+    [
+      4.040367000338302,
+      8.126827081828653
+    ]
+  ],
+  "ratio_monolayer_random_tuned": [
+    3.784812954030977,
+    [
+      2.5716199592522138,
+      5.661925286988247
+    ]
+  ],
+  "ratio_monolayer_random_default": [
+    3.8572677685881973,
+    [
+      2.6818383599202185,
+      5.57661613299455
+    ]
+  ],
+  "gain_default_minus_tuned": {
+    "random": [
+      0.09426350318175114,
+      [
+        -0.013360068905938171,
+        0.24138080005596127
+      ]
+    ],
+    "monolayer": [
+      0.5327115476961524,
+      [
+        -0.016311269427167117,
+        1.152044570059385
+      ]
+    ],
+    "family": [
+      0.049386054955594005,
+      [
+        -0.4140266083696648,
+        0.515470494131768
+      ]
+    ]
+  },
+  "note": "resampling unit = structure family (monolayers nest within families, so this is the conservative choice)"
+}

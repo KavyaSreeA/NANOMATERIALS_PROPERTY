@@ -175,3 +175,9 @@ Commands: `python -m src.train --task A`, `python -m src.robustness --seeds 42 4
 
 1. Locate BiDB (and the uid map) to run Task B.
 2. Add bilayer stiffness labels (e.g. from a universal ML potential validated against C2DB/JARVIS) before any bilayer or multi-task claim.
+
+## Addendum 2026-10-06: generality, graph network, tuning, replication
+Written from `results/panel_summary*.csv`, `panel_hypotheses*.json`, `panel_replication_checks.json`, `phaseA_cgcnn_vs_lgbm.json`, `phaseA_cgcnn_seeds.json`, `phaseC_*.json` (pre-registrations in `results/*design.md`). Full narrative: README section 9b and `paper/manuscript_draft.md`.
+- C2DB panel (12 properties): family/random MAE ratio 1.12-1.92, every CI above 1; chemical-system/random 0.99-1.10. JARVIS-2D replication (10 properties): 1.03-1.42, every CI above 1, 7 of 10 above 1.05 (prediction P1 failed: 70% < 80%).
+- Label-only diagnostic D_family does not forecast skill retention: rho 0.00 [-0.60, 0.81] (C2DB), 0.01 (JARVIS), -0.04 [-0.51, 0.51] (pooled); criterion rho <= -0.6 with CI below 0 not met.
+- CGCNN, 3 seeds: ratio 1.34-1.43, ensemble 1.44 [1.33, 1.55]; MAE not better than LightGBM. Nested tuning, Y2D: random 13.74 -> 12.86, family 19.82 -> 19.83 (ratio 1.54 [1.37, 1.77]); BiDB binding energy: gains within noise.

@@ -93,11 +93,13 @@ def boot_over_families(per, n=NB):
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--oof", default="panel_oof")
+    ap.add_argument("--tag", default="", help="suffix for targets json / outputs, e.g. jarvis")
     args = ap.parse_args()
+    sfx = f"_{args.tag}" if args.tag else ""
     cfg = D.load_config()
     rd = D.ROOT / cfg["paths"]["results_dir"]
     oof = D.ROOT / "cache" / args.oof
-    meta = {t["target"]: t for t in json.load(open(rd / "panel_targets.json"))["included"]}
+    meta = {t["target"]: t for t in json.load(open(rd / f"panel_targets{sfx}.json"))["included"]}
     rows = []
     for t in meta:
         per = load_target(oof, t)
@@ -123,7 +125,7 @@ def main():
                      "kurtosis": float(pd.Series(yt).kurt())})
         print(f"  {t:<18} n={len(y):>6}  R_fam={rows[-1]['R_family']:.2f}  D_fam={d_fam:.2f}  ratio_fam={rows[-1]['ratio_family']:.2f}", flush=True)
     T = pd.DataFrame(rows)
-    T.to_csv(rd / "panel_summary.csv", index=False)
+    T.to_csv(rd / f"panel_summary{sfx}.csv", index=False)
     res = {"n_targets": len(T), "H1_share_ratio_family_gt_1.05": float((T.ratio_family > 1.05).mean()), "H1_all_R_family_lt_1": bool((T.R_family < 1).all())}
 
     def corr(x, y, n=NB):
@@ -157,8 +159,8 @@ def main():
         # axis classification (descriptive): which grouping removes more skill
         T["axis"] = np.where((T.R_family < T.R_chemsys - 0.05), "structure-family loss", np.where(T.R_chemsys < T.R_family - 0.05, "chemistry loss", "similar"))
         res["axis_counts"] = T.axis.value_counts().to_dict()
-        T.to_csv(rd / "panel_summary.csv", index=False)
-    json.dump(res, open(rd / "panel_hypotheses.json", "w"), indent=2)
+        T.to_csv(rd / f"panel_summary{sfx}.csv", index=False)
+    json.dump(res, open(rd / f"panel_hypotheses{sfx}.json", "w"), indent=2)
     print(json.dumps(res, indent=2))
     # ---- figures
     fig, ax = plt.subplots(1, 2, figsize=(11, 4.6))
@@ -169,7 +171,7 @@ def main():
             a.annotate(r.target, (r[xc], r[yc]), fontsize=7, xytext=(3, 3), textcoords="offset points")
         a.set_xlabel(xl); a.set_ylabel(yl); a.axhline(1, color="#bbbbbb", lw=.8)
     ax[0].set_title("Does the diagnostic forecast the loss? (family axis)"); ax[1].set_title("chemical-system axis")
-    fig.tight_layout(); (rd / "figures").mkdir(exist_ok=True); fig.savefig(rd / "figures" / "fig7_panel_diagnostic.png", dpi=140, bbox_inches="tight"); plt.close(fig)
+    fig.tight_layout(); (rd / "figures").mkdir(exist_ok=True); fig.savefig(rd / "figures" / f"fig7_panel_diagnostic{sfx}.png", dpi=140, bbox_inches="tight"); plt.close(fig)
 
 
 if __name__ == "__main__":
