@@ -64,9 +64,9 @@ def fig_workflow():
         arrow(x + 0.4, y1 + h / 2, x + 2.0, y1 + h / 2)
     # row 2: evaluation of the random-vs-grouped gap
     box(1, y2, w, h, "Y2D case study", "5 seeds, ablations,\nnull baselines\n(Sec. 4.2 - 4.4)", fc="#e9f7f1", ec="#1baf7a")
-    box(21.4, y2, w, h, "12-property panel", "C2DB properties,\nfamily vs chem. system\n(Sec. 4.5)", fc="#e9f7f1", ec="#1baf7a")
-    box(41.8, y2, w, h, "Model class / tuning", "CGCNN vs LightGBM;\nnested group-aware\ntuning (Sec. 4.6)", fc="#e9f7f1", ec="#1baf7a")
-    box(62.2, y2, w, h, "Label-only forecast", "pre-specified test:\nforecast not supported\n(Sec. 4.7)", fc="#e9f7f1", ec="#1baf7a")
+    box(21.4, y2, w, h, "22-property panel", "C2DB (12) + JARVIS-2D\n(10, replication)\n(Sec. 4.5)", fc="#e9f7f1", ec="#1baf7a")
+    box(41.8, y2, w, h, "Model class / tuning", "CGCNN (3 seeds) vs\nLightGBM; nested tuning\n(Sec. 4.6)", fc="#e9f7f1", ec="#1baf7a")
+    box(62.2, y2, w, h, "Label-only forecast", "pre-specified test:\nfails in both DBs\n(Sec. 4.7)", fc="#e9f7f1", ec="#1baf7a")
     box(82.6, y2, 16.4, h, "Bilayers + JARVIS", "BiDB binding energy /\ngap; JARVIS external\n(Sec. 4.8 - 4.9)", fc="#e9f7f1", ec="#1baf7a")
     arrow(91.0, y1 - 0.5, 91.0, y2 + h + 0.5)
     arrow(10.1, y1 - 0.5, 10.1, y2 + h + 0.5)
@@ -263,26 +263,42 @@ def fig_mlip():
 
 # ------------------------------------------------------------------ Fig. 6 panel
 def fig_panel():
-    d = pd.read_csv(RES / "panel_summary.csv").sort_values("ratio_family").reset_index(drop=True)
-    lab = {"hform": "hform", "ehull": "ehull", "gap": "gap (PBE)", "gap_hse": "gap (HSE)", "evac": "evac", "efermi": "efermi",
-           "vbm": "vbm", "alphax_el": "alphax_el", "plasmafrequency_x": "plasmafreq_x", "emass_cbm": "emass_cbm", "Y2D": "Y2D (stiffness)", "poisson": "Poisson ratio"}
-    fig, (a, b) = plt.subplots(1, 2, figsize=(7.1, 3.0), sharey=True)
-    y = np.arange(len(d))
-    a.hlines(y, d.ratio_family_lo, d.ratio_family_hi, color=C_FAM, lw=1.6)
-    a.plot(d.ratio_family, y, "o", color=C_FAM, ms=4.5, label="family / random")
-    a.hlines(y, d.ratio_chemsys_lo, d.ratio_chemsys_hi, color=C_CHEM, lw=1.2)
-    a.plot(d.ratio_chemsys, y, "s", color=C_CHEM, ms=3.8, label="chemical system / random")
-    a.axvline(1, color=INK, lw=0.8)
-    a.set_yticks(y); a.set_yticklabels([lab[t] for t in d.target], fontsize=7)
+    c = pd.read_csv(RES / "panel_summary.csv").sort_values("ratio_family").reset_index(drop=True)
+    j = pd.read_csv(RES / "panel_summary_jarvis.csv").sort_values("ratio_family").reset_index(drop=True)
+    labc = {"hform": "hform", "ehull": "ehull", "gap": "gap (PBE)", "gap_hse": "gap (HSE)", "evac": "evac", "efermi": "efermi",
+            "vbm": "vbm", "alphax_el": "alphax_el", "plasmafrequency_x": "plasmafreq_x", "emass_cbm": "emass_cbm", "Y2D": "Y2D (stiffness)", "poisson": "Poisson ratio"}
+    labj = {"formation_energy_peratom": "formation energy", "optb88vdw_bandgap": "gap (OptB88vdW)", "epsx": "epsx", "avg_elec_mass": "avg_elec_mass",
+            "n-Seebeck": "n-Seebeck", "n-powerfact": "n-powerfact", "ncond": "ncond", "nkappa": "nkappa", "exfoliation_energy": "exfoliation energy", "spillage": "spillage"}
+    rows = [(r, labj[r.target], "J") for r in j.itertuples()] + [(None, "", "gap")] + [(r, labc[r.target], "C") for r in c.itertuples()]
+    fig, (a, b) = plt.subplots(1, 2, figsize=(7.1, 4.4), sharey=True)
+    ytick, ylab = [], []
+    for y, (r, lab, kind) in enumerate(rows):
+        if kind == "gap":
+            continue
+        ytick.append(y); ylab.append(lab)
+        a.hlines(y, r.ratio_family_lo, r.ratio_family_hi, color=C_FAM, lw=1.6)
+        a.plot(r.ratio_family, y, "o", color=C_FAM, ms=4.3)
+        a.hlines(y, r.ratio_chemsys_lo, r.ratio_chemsys_hi, color=C_CHEM, lw=1.2)
+        a.plot(r.ratio_chemsys, y, "s", color=C_CHEM, ms=3.6)
+        if r.skill_random > 0.2:
+            b.hlines(y, r.R_family_lo, r.R_family_hi, color=C_FAM, lw=1.6)
+            b.plot(r.R_family, y, "o", color=C_FAM, ms=4.3)
+            b.hlines(y, r.R_chemsys_lo, r.R_chemsys_hi, color=C_CHEM, lw=1.2)
+            b.plot(r.R_chemsys, y, "s", color=C_CHEM, ms=3.6)
+    ysep = len(j)
+    for ax in (a, b):
+        ax.axvline(1, color=INK, lw=0.8); ax.axhline(ysep, color=GREY, lw=0.7, ls=(0, (3, 2)))
+        ax.grid(axis="y", visible=False)
+    a.set_yticks(ytick); a.set_yticklabels(ylab, fontsize=6.6)
+    a.text(2.12, ysep / 2 - 0.5, "JARVIS-DFT 2D", rotation=90, va="center", ha="center", fontsize=7, color=MUTED)
+    a.text(2.12, ysep + 1 + len(c) / 2 - 0.5, "C2DB", rotation=90, va="center", ha="center", fontsize=7, color=MUTED)
+    a.set_xlim(0.9, 2.15)
+    a.axvline(1.05, color=GREY, lw=0.6, ls=":")
     a.set_xlabel("MAE ratio, grouped / random (95 % CI)"); a.set_title("(a) Error inflation", loc="left", color=INK)
-    a.legend(frameon=False, loc="lower right", fontsize=6.6, handletextpad=0.3); a.grid(axis="y", visible=False)
-    b.hlines(y, d.R_family_lo, d.R_family_hi, color=C_FAM, lw=1.6)
-    b.plot(d.R_family, y, "o", color=C_FAM, ms=4.5)
-    b.hlines(y, d.R_chemsys_lo, d.R_chemsys_hi, color=C_CHEM, lw=1.2)
-    b.plot(d.R_chemsys, y, "s", color=C_CHEM, ms=3.8)
-    b.axvline(1, color=INK, lw=0.8)
+    h1, = a.plot([], [], "o", color=C_FAM, label="family / random"); h2, = a.plot([], [], "s", color=C_CHEM, label="chemical system / random")
+    a.legend(handles=[h1, h2], frameon=False, loc="lower right", fontsize=6.4, handletextpad=0.3, bbox_to_anchor=(1.0, 0.0))
+    b.set_xlim(0.1, 1.08)
     b.set_xlabel("skill retained, $R=S_{\\mathrm{grouped}}/S_{\\mathrm{random}}$ (95 % CI)"); b.set_title("(b) Skill retained", loc="left", color=INK)
-    b.set_xlim(0.1, 1.08); b.grid(axis="y", visible=False)
     fig.tight_layout()
     save(fig, "fig6_panel.png")
 
@@ -290,26 +306,38 @@ def fig_panel():
 # ------------------------------------------------------------------ Fig. 7 model class and tuning
 def fig_models():
     A = json.loads((RES / "phaseA_cgcnn_vs_lgbm.json").read_text())
+    S = json.loads((RES / "phaseA_cgcnn_seeds.json").read_text())
     T = json.loads((RES / "phaseC_tuning.json").read_text())
-    names = ["LightGBM\n(default)", "CGCNN\n(1 seed, untuned)", "LightGBM\n(nested tuning)"]
-    ratio = [A["ratio_family_over_random"]["lgbm"], A["ratio_family_over_random"]["cgcnn"], T["ratio_family_random_tuned"][0]]
-    lo = [A["ratio_family_over_random"]["lgbm_ci95"][0], A["ratio_family_over_random"]["cgcnn_ci95"][0], T["ratio_family_random_tuned"][1][0]]
-    hi = [A["ratio_family_over_random"]["lgbm_ci95"][1], A["ratio_family_over_random"]["cgcnn_ci95"][1], T["ratio_family_random_tuned"][1][1]]
-    mae_r = [A["MAE_N_per_m"]["random|lgbm"], A["MAE_N_per_m"]["random|cgcnn"], T["MAE_tuned_default"]["random"][0]]
-    mae_f = [A["MAE_N_per_m"]["family|lgbm"], A["MAE_N_per_m"]["family|cgcnn"], T["MAE_tuned_default"]["family"][0]]
-    fig, (a, b) = plt.subplots(1, 2, figsize=(7.1, 2.5))
-    x = np.arange(3); w = 0.34
+    B = json.loads((RES / "phaseC_tuning_taskb.json").read_text())
+    names = ["LightGBM\n(default)", "CGCNN\n(seed 42)", "CGCNN\n(3-seed ens.)", "LightGBM\n(tuned)"]
+    ratio = [A["ratio_family_over_random"]["lgbm"], A["ratio_family_over_random"]["cgcnn"], S["ensemble"]["ratio"], T["ratio_family_random_tuned"][0]]
+    lo = [A["ratio_family_over_random"]["lgbm_ci95"][0], A["ratio_family_over_random"]["cgcnn_ci95"][0], S["ensemble"]["ratio_ci95"][0], T["ratio_family_random_tuned"][1][0]]
+    hi = [A["ratio_family_over_random"]["lgbm_ci95"][1], A["ratio_family_over_random"]["cgcnn_ci95"][1], S["ensemble"]["ratio_ci95"][1], T["ratio_family_random_tuned"][1][1]]
+    mae_r = [A["MAE_N_per_m"]["random|lgbm"], A["MAE_N_per_m"]["random|cgcnn"], S["per_seed"]["ens"]["MAE"]["random"], T["MAE_tuned_default"]["random"][0]]
+    mae_f = [A["MAE_N_per_m"]["family|lgbm"], A["MAE_N_per_m"]["family|cgcnn"], S["per_seed"]["ens"]["MAE"]["family"], T["MAE_tuned_default"]["family"][0]]
+    fig, (a, b, c) = plt.subplots(1, 3, figsize=(7.1, 2.7), gridspec_kw={"width_ratios": [1.15, 1.15, 0.85]})
+    x = np.arange(4); w = 0.36
     b.bar(x - w / 2, mae_r, w, color=C_RANDOM, label="random split")
     b.bar(x + w / 2, mae_f, w, color=C_FAM, hatch="//", edgecolor="white", lw=0.5, label="family split")
-    for xi, v in zip(x - w / 2, mae_r): b.text(xi, v + 0.5, f"{v:.1f}", ha="center", fontsize=6.8, color=INK)
-    for xi, v in zip(x + w / 2, mae_f): b.text(xi, v + 0.5, f"{v:.1f}", ha="center", fontsize=6.8, color=INK)
-    b.set_xticks(x); b.set_xticklabels(names, fontsize=7); b.set_ylabel("MAE of $Y_{2D}$ (N/m)  $\\downarrow$"); b.set_ylim(0, 27)
-    b.set_title("(b) Error", loc="left", color=INK); b.legend(frameon=False, loc="upper left", fontsize=6.8, handlelength=1.2); b.grid(axis="x", visible=False)
-    a.errorbar(x, ratio, yerr=[np.array(ratio) - np.array(lo), np.array(hi) - np.array(ratio)], fmt="o", color=INK, ms=4.5, capsize=3, lw=1.1)
-    for xi, r, l_, h_ in zip(x, ratio, lo, hi): a.text(xi + 0.12, r, f"{r:.2f}\n[{l_:.2f}, {h_:.2f}]", fontsize=6.4, va="center", color=INK)
-    a.axhline(1, color=INK, lw=0.8); a.set_xlim(-0.5, 2.75); a.set_ylim(0.9, 1.95)
-    a.set_xticks(x); a.set_xticklabels(names, fontsize=7); a.set_ylabel("MAE ratio, family / random (95 % CI)")
-    a.set_title("(a) The gap persists", loc="left", color=INK); a.grid(axis="x", visible=False)
+    for xi, v in zip(x - w / 2, mae_r): b.text(xi, v + 0.4, f"{v:.1f}", ha="center", fontsize=6.2, color=INK)
+    for xi, v in zip(x + w / 2, mae_f): b.text(xi, v + 0.4, f"{v:.1f}", ha="center", fontsize=6.2, color=INK)
+    b.set_xticks(x); b.set_xticklabels(names, fontsize=6.2); b.set_ylabel("MAE of $Y_{2D}$ (N/m)  $\\downarrow$"); b.set_ylim(0, 27)
+    b.set_title("(b) Error", loc="left", color=INK); b.legend(frameon=False, loc="upper left", fontsize=6.4, handlelength=1.2); b.grid(axis="x", visible=False)
+    a.errorbar(x, ratio, yerr=[np.array(ratio) - np.array(lo), np.array(hi) - np.array(ratio)], fmt="o", color=INK, ms=4.2, capsize=3, lw=1.1)
+    for xi, r in zip(x, ratio): a.text(xi + 0.1, r, f"{r:.2f}", fontsize=6.4, va="center", color=INK)
+    a.axhline(1, color=INK, lw=0.8); a.set_xlim(-0.5, 3.7); a.set_ylim(0.9, 1.95)
+    a.set_xticks(x); a.set_xticklabels(names, fontsize=6.2); a.set_ylabel("MAE ratio, family / random (95 % CI)")
+    a.set_title("(a) $Y_{2D}$: the gap persists", loc="left", color=INK); a.grid(axis="x", visible=False)
+    # (c) Task B tuning
+    labs = ["family /\nrandom", "monolayer /\nrandom"]
+    d_r = [B["ratio_family_random_default"], B["ratio_monolayer_random_default"]]
+    t_r = [B["ratio_family_random_tuned"], B["ratio_monolayer_random_tuned"]]
+    for i, (d, t) in enumerate(zip(d_r, t_r)):
+        for off, (pt, ci), col, lab in ((-0.12, d, C_RANDOM, "default"), (0.12, t, C_CHEM, "tuned")):
+            c.errorbar(i + off, pt, yerr=[[pt - ci[0]], [ci[1] - pt]], fmt="o", color=col, ms=4.2, capsize=3, lw=1.1, label=lab if i == 0 else None)
+    c.axhline(1, color=INK, lw=0.8); c.set_xlim(-0.5, 1.5); c.set_ylim(0, 9.4)
+    c.set_xticks([0, 1]); c.set_xticklabels(labs, fontsize=6.6); c.set_ylabel("MAE ratio, binding energy (95 % CI)")
+    c.set_title("(c) BiDB: tuning", loc="left", color=INK); c.legend(frameon=False, loc="upper right", fontsize=6.4); c.grid(axis="x", visible=False)
     fig.tight_layout()
     save(fig, "fig7_models_tuning.png")
 

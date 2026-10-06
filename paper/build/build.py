@@ -69,6 +69,21 @@ PANEL = ('<table style="width:88%;margin:0 auto"><tr><th class="l">Property</th>
          '<th>MAE ratio, family / random</th><th>Skill retained <i>R</i><sub>fam</sub></th><th>Ratio, chem. sys.</th><th><i>D</i><sub>fam</sub></th></tr>'
          + "".join(_rows) + '</table>')
 
+_jl = {"formation_energy_peratom": "formation energy", "optb88vdw_bandgap": "gap (OptB88vdW)", "epsx": "&epsilon;<sub>x</sub> (epsx)", "avg_elec_mass": "avg_elec_mass",
+       "n-Seebeck": "n-Seebeck", "n-powerfact": "n-powerfact", "ncond": "ncond", "nkappa": "nkappa", "exfoliation_energy": "exfoliation energy", "spillage": "spillage"}
+_ax = {"structure-family loss": "family", "similar": "similar", "chemistry loss": "chemistry"}
+_j = pd.read_csv(OUT.parent / "mat-ml" / "results" / "panel_summary_jarvis.csv")
+_jr = []
+for _, r in _j.iterrows():
+    Rtxt = f'{r.R_family:.2f} [{r.R_family_lo:.2f}, {r.R_family_hi:.2f}]' if r.skill_random > 0.2 else "&mdash;"
+    _jr.append(f'<tr><td class="l">{_jl[r.target]}</td><td>{int(r.n):,}</td><td>{int(r.n_families):,}</td>'
+               f'<td>{r.ratio_family:.2f} [{r.ratio_family_lo:.2f}, {r.ratio_family_hi:.2f}]</td><td>{Rtxt}</td>'
+               f'<td>{r.ratio_chemsys:.2f}</td><td>{r.D_family:.2f}</td><td>{_ax[r.axis]}</td></tr>')
+_jr[-1] = _jr[-1].replace('<tr>', '<tr class="last">', 1)
+JPANEL = ('<table style="width:92%;margin:0 auto"><tr><th class="l">Property</th><th><i>n</i></th><th>Families</th>'
+          '<th>MAE ratio, family / random</th><th>Skill retained <i>R</i><sub>fam</sub></th><th>Ratio, chem. sys.</th><th><i>D</i><sub>fam</sub></th><th>Dominant axis</th></tr>'
+          + "".join(_jr) + '</table>')
+
 html = (HERE / "paper_template.html").read_text(encoding="utf-8")
 order = []
 
@@ -85,7 +100,7 @@ def cite(m):
     return "[" + "], [".join(str(n) for n in nums) + "]"
 
 
-body = html.replace("[[PANEL_TABLE]]", PANEL)
+body = html.replace("[[PANEL_TABLE]]", PANEL).replace("[[JARVIS_PANEL_TABLE]]", JPANEL)
 body = re.sub(r"\[\[([a-z0-9, ]+)\]\]", lambda m: cite(m), body)
 reflist = "\n".join(f"<div>[{i + 1}] {REFS[k]}</div>" for i, k in enumerate(order))
 body = body.replace("[[REFLIST]]", reflist)
