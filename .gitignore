@@ -6,3 +6,10 @@ mat-ml/results/_*.err
 Dataset/
 paper/build/node_modules/
 paper/build/package*.json
+
+# web app
+webapp/frontend/node_modules/
+webapp/frontend/dist/
+mat-ml/models/taskA_reference.npz
+__pycache__/
+*.pyc
