@@ -1,0 +1,12 @@
+{
+ "median_distance_random": 2.4440083579693814,
+ "median_distance_family": 3.2154096859442864,
+ "distance_ratio_family_over_random": 1.315629578540324,
+ "families": 337,
+ "rho_distance_increase_vs_penalty": 0.33265556060009377,
+ "ci95": [
+  0.225567987732029,
+  0.43266945825780656
+ ],
+ "M6_pass": true
+}
