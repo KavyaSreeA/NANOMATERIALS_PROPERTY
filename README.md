@@ -247,6 +247,14 @@ python -m src.make_paper_figures
 ```
 Every number above comes from files in [`mat-ml/results/`](mat-ml/results/) (`headline_metrics.md` has MAE, RMSE, R², ln R² for every configuration). The ML-potential work needs a separate GPU environment (see `mlip_calibration.md`).
 
+### Web app (results viewer + Y2D predictor)
+A small read-only FastAPI app in [`mat-ml/app/`](mat-ml/app/) serves the saved results (headline metrics, property panels, GNN and tuning, figures, model cards) and predicts Y2D with the saved model. It never trains or writes anything.
+```
+cd mat-ml
+pip install -r requirements.txt
+python -m uvicorn app.main:app --reload      # then open http://127.0.0.1:8000  (API docs: /docs)
+```
+
 ## 13. Data sources and licence
 | Dataset | Used for | Source |
 |---|---|---|

@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>2D-materials ML results</title>
+<style>
+:root{--bg:#fff;--fg:#1c2330;--mut:#667085;--line:#dde2ea;--acc:#2a6fbb;--card:#f6f8fb}
+@media (prefers-color-scheme:dark){:root{--bg:#0f141b;--fg:#e6e9ef;--mut:#98a2b3;--line:#2a3340;--acc:#6aa5e8;--card:#171e28}}
+*{box-sizing:border-box}body{margin:0;font:15px/1.5 system-ui,Segoe UI,sans-serif;background:var(--bg);color:var(--fg)}
+header{padding:20px 16px;border-bottom:1px solid var(--line)}h1{margin:0;font-size:20px}header p{margin:4px 0 0;color:var(--mut)}
+nav{display:flex;gap:4px;padding:8px 16px;border-bottom:1px solid var(--line);flex-wrap:wrap}
+nav button{background:none;border:0;padding:8px 12px;border-radius:6px;color:var(--fg);cursor:pointer;font:inherit}
+nav button.on{background:var(--card);color:var(--acc);font-weight:600}main{max-width:1100px;margin:0 auto;padding:16px}
+section{display:none}section.on{display:block}table{border-collapse:collapse;width:100%;font-size:13.5px;margin:8px 0 20px}
+th,td{padding:6px 10px;border-bottom:1px solid var(--line);text-align:right}th:first-child,td:first-child{text-align:left}th{color:var(--mut);font-weight:600}
+.card{background:var(--card);border:1px solid var(--line);border-radius:8px;padding:12px 14px;margin:10px 0}.mut{color:var(--mut)}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:12px}.grid img{width:100%;border:1px solid var(--line);border-radius:6px;background:#fff}
+form{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px}label{display:flex;flex-direction:column;font-size:12px;color:var(--mut);gap:3px}
+input,select{padding:7px;border:1px solid var(--line);border-radius:6px;background:var(--bg);color:var(--fg);font:inherit}
+button.go{grid-column:1/-1;justify-self:start;background:var(--acc);color:#fff;border:0;border-radius:6px;padding:8px 18px;cursor:pointer;font:inherit}
+.bar{height:8px;background:var(--acc);border-radius:4px;min-width:2px}.err{color:#c0392b}
+</style></head><body>
+<header><h1>2D-materials ML: random vs. family-grouped evaluation</h1><p>Read-only view of the saved results and the saved Task A model. Intervals are 95% cluster bootstraps over structure families.</p></header>
+<nav id="nav"></nav>
+<main>
+<section id="headline"><h2>Headline metrics</h2><p class="mut">MAE by split scheme. Units: N/m (Y2D), dimensionless (Poisson), meV/Å² (binding energy).</p><div id="headline-t"></div></section>
+<section id="panel"><h2>Property panel</h2>
+<p class="mut">Family-grouped MAE divided by random-CV MAE (above 1 = random splits are optimistic). <select id="db"><option value="c2db">C2DB (12 properties)</option><option value="jarvis">JARVIS-2D replication (10)</option></select></p><div id="panel-t"></div></section>
+<section id="robust"><h2>Graph network and tuning</h2><div id="robust-t"></div></section>
+<section id="figs"><h2>Figures</h2><div class="grid" id="figs-g"></div></section>
+<section id="predict"><h2>Predict Y2D</h2><p class="mut">Uses the saved LightGBM model. Typical error ≈ 14 N/m (known structure family) to ≈ 20 N/m (unseen family). Defaults are MoS2 (note: MoS2 was in the training set, so its prediction is optimistic).</p>
+<form id="pf"></form><div id="pr" class="card" hidden></div></section>
+<section id="cards"><h2>Model cards</h2><pre id="cards-t" class="card" style="overflow:auto;font-size:12px"></pre></section>
+</main>
+<script>
+const $=s=>document.querySelector(s), f=(x,d=2)=>x==null||isNaN(x)?"–":(+x).toFixed(d);
+const tabs=[["headline","Headline"],["panel","Property panel"],["robust","GNN & tuning"],["figs","Figures"],["predict","Predict"],["cards","Model cards"]];
+const nav=$("#nav");tabs.forEach(([id,t])=>{const b=document.createElement("button");b.textContent=t;b.onclick=()=>show(id);b.dataset.id=id;nav.appendChild(b)});
+const api=async u=>{const r=await fetch(u);if(!r.ok)throw new Error(u+" "+r.status);return r.json()};
+const table=(h,rows)=>"<table><tr>"+h.map(x=>`<th>${x}</th>`).join("")+"</tr>"+rows.map(r=>"<tr>"+r.map(x=>`<td>${x}</td>`).join("")+"</tr>").join("")+"</table>";
+function show(id){document.querySelectorAll("section").forEach(s=>s.classList.toggle("on",s.id===id));nav.querySelectorAll("button").forEach(b=>b.classList.toggle("on",b.dataset.id===id));history.replaceState(null,"","#"+id)}
+async function headline(){const d=await api("/api/headline");$("#headline-t").innerHTML=table(["Analysis","Scheme","MAE","95% CI","R²"],d.map(r=>[r.analysis,r.scheme,f(r.MAE),`[${f(r.MAE_lo)}, ${f(r.MAE_hi)}]`,f(r.R2)]))}
+async function panel(){const d=(await api("/api/panel/"+$("#db").value)).sort((a,b)=>b.ratio_family-a.ratio_family),mx=Math.max(...d.map(r=>r.ratio_family_hi));
+$("#panel-t").innerHTML=table(["Property","n","family / random [CI]","","chem. system / random","skill retained"],d.map(r=>[r.target,r.n,`${f(r.ratio_family)} [${f(r.ratio_family_lo)}, ${f(r.ratio_family_hi)}]`,`<div class="bar" style="width:${100*r.ratio_family/mx}%"></div>`,f(r.ratio_chemsys),f(r.R_family)]))}
+async function robust(){const [r,t]=await Promise.all([api("/api/robustness"),api("/api/hypotheses")]),s=r.gnn_seeds,a=r.tuning_taskA,b=r.tuning_taskB,rc=t.replication_checks;
+$("#robust-t").innerHTML=`<h3>Graph network (CGCNN), Y2D, MAE in N/m</h3>`+table(["Model","random","family","family / random"],Object.entries(s.per_seed).map(([k,v])=>[k==="lgbm"?"LightGBM":k==="ens"?"CGCNN, 3-seed ensemble":"CGCNN seed "+k.slice(1),f(v.MAE.random),f(v.MAE.family),f(v.ratio_family_over_random)]))+
+`<p class="mut">Ensemble ratio ${f(s.ensemble.ratio)} [${f(s.ensemble.ratio_ci95[0])}, ${f(s.ensemble.ratio_ci95[1])}]: the graph network does not narrow the gap.</p>
+<h3>Nested group-aware tuning (LightGBM)</h3>`+table(["Task","Scheme","default MAE","tuned MAE"],[...["random","family"].map(k=>["Y2D (N/m)",k,f(a.MAE_tuned_default[k][1]),f(a.MAE_tuned_default[k][0])]),...["random","monolayer","family"].map(k=>["Binding energy (meV/Å²)",k,f(b.MAE_tuned_default[k][1]),f(b.MAE_tuned_default[k][0])])])+
+`<h3>Label-only diagnostic (pre-registered test)</h3><p>Spearman ρ between the diagnostic and skill retention: C2DB ${f(t.c2db.H2_spearman_D_family_vs_R_family.rho)}, JARVIS ${f(t.jarvis.H2_spearman_D_family_vs_R_family.rho)}, pooled ${f(rc.P4_pooled_rho)}. Success needed ρ ≤ −0.6 with a CI below 0: <b>not met</b>.</p>`}
+async function figs(){const d=await api("/api/figures");$("#figs-g").innerHTML=d.map(x=>`<a href="${x.url}" target="_blank"><img loading="lazy" src="${x.url}" alt="${x.name}"><div class="mut">${x.name}</div></a>`).join("")}
+const fields=[["formula","MoS2","text"],["a",3.19],["b",3.19],["gamma",120],["area_per_atom",2.93],["nat",3],["thickness",3.13],["spg_number",187]];
+$("#pf").innerHTML=fields.map(([n,v,t])=>`<label>${n}<input name="${n}" value="${v}" ${t==="text"?"":'type="number" step="any"'} required></label>`).join("")+'<button class="go">Predict</button>';
+$("#pf").onsubmit=async e=>{e.preventDefault();const o={};new FormData(e.target).forEach((v,k)=>o[k]=k==="formula"?v:+v);const box=$("#pr");box.hidden=false;box.textContent="…";
+const r=await fetch("/api/predict/y2d",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(o)}),j=await r.json();
+box.innerHTML=r.ok?`<b>Y2D ≈ ${f(j.Y2D_N_per_m,1)} N/m</b><div class="mut">${j.note}</div>`:`<span class="err">${typeof j.detail==="string"?j.detail:JSON.stringify(j.detail)}</span>`};
+$("#cards-t").textContent="loading…";api("/api/model-cards").then(j=>$("#cards-t").textContent=JSON.stringify(j,null,2)).catch(e=>$("#cards-t").textContent=e);
+$("#db").onchange=panel;[headline,panel,robust,figs].forEach(fn=>fn().catch(e=>console.error(e)));show((location.hash||"#headline").slice(1));
+</script></body></html>
