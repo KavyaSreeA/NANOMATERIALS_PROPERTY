@@ -41,7 +41,6 @@
     "chemsys_shared_with_c2db_clean": 131
   },
   "bidb": {
-    "status": "unavailable",
-    "reason": "BiDB properties file not found: C:\\Users\\kavya\\NANOMATERIALS_PROPERTY\\Dataset\\bidb\\bidb_properties.csv"
+    "bilayers": 10192
   }
 }

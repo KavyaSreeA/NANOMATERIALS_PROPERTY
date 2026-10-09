@@ -102,6 +102,6 @@ Metrics are means over folds, in original units (N/m for Y2D). `x(s/random)` = M
     "numpy": "2.4.6",
     "pandas": "2.3.3"
   },
-  "runtime_s": 997.1
+  "runtime_s": 1219.3
 }
 ```
