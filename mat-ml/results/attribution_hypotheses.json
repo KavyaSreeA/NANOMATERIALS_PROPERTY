@@ -1,0 +1,29 @@
+{
+ "A1_rank_agreement_random_vs_family": {
+  "rho": 0.9719688542825362,
+  "pass": true
+ },
+ "A2_max_group_share_family": {
+  "top_group": "area_per_atom",
+  "share": 0.38838605878114096,
+  "pass": true
+ },
+ "A3_spg_share": {
+  "random": 0.03337839396164384,
+  "chemsys": 0.033285232184351796,
+  "family": 0.019609997637452317,
+  "pass": true
+ },
+ "A4_perm_vs_shap_rank": {
+  "random": 0.9052280311457174,
+  "chemsys": 0.9127919911012237,
+  "family": 0.9119021134593993,
+  "pass": true
+ },
+ "A5_geometry_share_exploratory": {
+  "random": 0.49998741104372557,
+  "chemsys": 0.5023474979565815,
+  "family": 0.5413046456633364,
+  "family_gt_random": true
+ }
+}
