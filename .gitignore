@@ -14,3 +14,4 @@ webapp/frontend/dist/
 mat-ml/models/taskA_reference.npz
 __pycache__/
 *.pyc
+mat-ml/.venv/
